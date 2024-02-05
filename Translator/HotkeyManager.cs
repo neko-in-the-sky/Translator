@@ -7,7 +7,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Translator;
 
-public class HotkeyManager(Window window, Action onHotkeyPressed)
+public class HotkeyManager
 {
     private const int HotkeyId = 0;
 
@@ -41,9 +41,18 @@ public class HotkeyManager(Window window, Action onHotkeyPressed)
         [In] IntPtr hWnd,
         [In] int id);
 
+    private Window _window;
+    private Action _onHotkeyPressed;
+
+    public void Init(Window window, Action onHotkeyPressed)
+    {
+        _window = window;
+        _onHotkeyPressed = onHotkeyPressed;
+    }
+    
     public void RegisterHotKey()
     {
-        var windowInteropHelper = new WindowInteropHelper(window);
+        var windowInteropHelper = new WindowInteropHelper(_window);
         var hwndSource = HwndSource.FromHwnd(windowInteropHelper.Handle);
         hwndSource!.AddHook(HwndHook);
 
@@ -64,7 +73,7 @@ public class HotkeyManager(Window window, Action onHotkeyPressed)
 
     public void UnregisterHotKey()
     {
-        var windowInteropHelper = new WindowInteropHelper(window);
+        var windowInteropHelper = new WindowInteropHelper(_window);
         UnregisterHotKey(windowInteropHelper.Handle, HotkeyId);
     }
 
@@ -72,7 +81,7 @@ public class HotkeyManager(Window window, Action onHotkeyPressed)
     {
         if (msg == WmHotkeyMessageId && wParam.ToInt32() == HotkeyId)
         {
-            onHotkeyPressed();
+            _onHotkeyPressed();
             handled = true;
         }
 

@@ -157,4 +157,7 @@
   <data name="Notification_FailedToAddHotkey" xml:space="preserve">
     <value>Не удалось зарегистрировать Ctrl+Space в качестве горячей клавиши.</value>
   </data>
+  <data name="Notification_SuspiciousText" xml:space="preserve">
+    <value>Если вы действительно хотите выполнить поиск для этого текста, нажмите одну из кнопок.</value>
+  </data>
 </root>

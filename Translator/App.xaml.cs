@@ -1,7 +1,11 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Toolkit.Uwp.Notifications;
+using Translator.Blocklist;
 using Translator.Configuration;
 
 namespace Translator
@@ -16,7 +20,16 @@ namespace Translator
         public App()
         {
             var builder = Host.CreateApplicationBuilder();
-            builder.Services.AddSingleton<MainWindow>();
+            
+            builder.Services
+                .AddSingleton<HotkeyManager>()
+                .AddSingleton<PageBuilder>()
+                .AddSingleton<NotificationStateChecker>()
+                .AddSingleton<BlocklistManager>()
+                .AddSingleton<JsSelector>()
+                .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<MainWindow>();
+            
             builder.Logging
                 .ClearProviders()
                 .AddSimpleConsole();
@@ -25,6 +38,9 @@ namespace Translator
                 builder.Configuration.GetSection(key: nameof(ApplicationSettings)));
             
             _host = builder.Build();
+
+            CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(
+                    _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.Culture);
         }
 
         private async void App_OnStartup(object sender, StartupEventArgs e)
@@ -39,6 +55,7 @@ namespace Translator
             using (_host)
             {
                 await _host.StopAsync();
+                ToastNotificationManagerCompat.History.Clear();
             }
         }
     }

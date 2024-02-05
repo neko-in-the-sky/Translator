@@ -7,6 +7,7 @@
     xmlns:p="clr-namespace:Translator.Properties"
     xmlns:tb="http://www.hardcodet.net/taskbar"
     xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+    xmlns:translator="clr-namespace:Translator"
     Title="{x:Static p:Resources.MainWindow_Title}"
     Width="650"
     Height="500"
@@ -16,6 +17,7 @@
     ShowInTaskbar="False"
     WindowStartupLocation="Manual"
     WindowStyle="None"
+    d:DataContext="{d:DesignData Type=translator:MainWindowViewModel}"
     mc:Ignorable="d">
 
     <Window.Resources>
@@ -59,44 +61,35 @@
                 </Grid.ColumnDefinitions>
                 <TextBox
                     Name="QueryTextBox"
+                    Text="{Binding Path=QueryText}"
                     Grid.Column="0"
                     Height="25"
                     VerticalContentAlignment="Center"
                     FontSize="14"
                     ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}" />
-                <Button
-                    x:Name="OxfordSearchButton"
-                    Grid.Column="1"
-                    Width="24"
-                    Height="24"
-                    Margin="5,0,0,0"
-                    Click="OxfordSearchButton_Click"
-                    Style="{StaticResource FlatButtonStyle}"
-                    ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
-                    <Image Source="/icons/oxford.ico" />
-                </Button>
-                <Button
-                    x:Name="MultitranSearchButton"
-                    Grid.Column="2"
-                    Width="24"
-                    Height="24"
-                    Margin="5,0,0,0"
-                    Click="MultitranSearchButton_Click"
-                    Style="{StaticResource FlatButtonStyle}"
-                    ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
-                    <Image Source="/icons/multitran.ico" />
-                </Button>
-                <Button
-                    x:Name="DeeplSearchButton"
-                    Grid.Column="3"
-                    Width="24"
-                    Height="24"
-                    Margin="5,0,0,0"
-                    Click="DeeplSearchButton_OnClick"
-                    Style="{StaticResource FlatButtonStyle}"
-                    ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
-                    <Image Source="/icons/deepl.ico" />
-                </Button>
+                
+                <ItemsControl ItemsSource="{Binding SearchCommands}"
+                              Grid.Column="1">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                x:Name="OxfordSearchButton"
+                                Width="24"
+                                Height="24"
+                                Margin="5,0,0,0"
+                                Command="{Binding Command}"
+                                Style="{StaticResource FlatButtonStyle}"
+                                ToolTip="{Binding ToolTip}">
+                                <Image Source="{Binding IconFilePath}" />
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Grid>
 
             <StackPanel
@@ -121,9 +114,7 @@
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Visibility="Visible"
-                NavigationCompleted="WebBrowser_OnNavigationCompleted"
-                 >
+                Visibility="Visible">
             </wpf:WebView2>
         </Grid>
     </Border>

@@ -1,288 +1,187 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Web.WebView2.Core;
-using Translator.Configuration;
+using Translator.Blocklist;
 
-namespace Translator
+namespace Translator;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly BlocklistManager _blocklistManager;
+    private readonly JsSelector _jsSelector;
+    private readonly ILogger<MainWindow> _logger;
+    private readonly WindowLocationManager _windowLocationManager;
+
+    public MainWindow(MainWindowViewModel mainWindowViewModel, BlocklistManager blocklistManager,
+        JsSelector jsSelector, ILogger<MainWindow> logger)
     {
-        private readonly ILogger<MainWindow> _logger;
-        private readonly HotkeyManager _hotkeyManager;
-        private readonly WindowLocationManager _windowLocationManager;
-        private readonly HashSet<string> _blacklist = new();
-        private CancellationTokenSource _loadingCts = new();
-        private readonly PageBuilder _pageBuilder = new();
+        _mainWindowViewModel = mainWindowViewModel;
+        _windowLocationManager = new WindowLocationManager(this);
 
-        public MainWindow(ILogger<MainWindow> logger, IOptions<ApplicationSettings> applicationSettings)
+        _mainWindowViewModel.NavigationRequested += (args) =>
         {
-            _logger = logger;
-            InitializeComponent();
-            _hotkeyManager = new HotkeyManager(this, TranslateFromClipboard);
-            _windowLocationManager = new WindowLocationManager(this);
-
-            Top = 100000;
-            Left = 100000;
-            Loaded += (s, e) =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
-                HideWindow();
-                Top = 0;
-                Left = 0;
-            };
-            
-            InitializeWebView2();
-
-            foreach (var file in Directory.EnumerateFiles("Blocklist", "*.txt"))
-            {
-                foreach (var line in File.ReadLines(file))
+                if (args.IsFromHotkey)
                 {
-                    if (line.StartsWith('#'))
-                        continue;
-                    var address = line;
-                    if (!file.EndsWith("my.txt"))
-                        address = address.Split(' ')[1];
-                    _blacklist.Add(address);
+                    (Left, Top) = _windowLocationManager.GetLeftAndTop();
                 }
-            }
-        }
-        
-        private void InitializeWebView2()
-        {
-            // Ensure CoreWebView2 is initialized, this might be part of your initialization logic
-            WebBrowser.CoreWebView2InitializationCompleted += (sender, args) =>
-            {
-                if (args.IsSuccess)
+
+                ShowWindow();
+                if (!string.IsNullOrEmpty(args.Url))
                 {
-                    // Add the WebResourceRequested event handler
-                    WebBrowser.CoreWebView2.WebResourceRequested += CoreWebView2_WebResourceRequested;
-            
-                    // Specify the resource context types for which the event handler is invoked
-                    // For example, to filter for all requests, use CoreWebView2WebResourceContext.All
-                    WebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
-                    
-                    WebBrowser.CoreWebView2.DOMContentLoaded += CoreWebView2OnDOMContentLoaded;
+                    NavigateToBlankPage();
+                    NavigateToUrl(args.Url);
                 }
-                else
+                else if (!string.IsNullOrEmpty(args.Page))
                 {
-                    // Handle the error, initialization failed
+                    NavigateToPage(args.Page);
                 }
-            };
-        }
+            });
+        };
 
-        private async void CoreWebView2OnDOMContentLoaded(object sender, CoreWebView2DOMContentLoadedEventArgs e)
+        _blocklistManager = blocklistManager;
+        _jsSelector = jsSelector;
+        _logger = logger;
+
+        InitializeComponent();
+        InitializeWebView2();
+
+        DataContext = _mainWindowViewModel;
+
+        Top = 100000;
+        Left = 100000;
+        Loaded += (_, _) =>
         {
-            if (WebBrowser.Source.AbsoluteUri.Contains("oxford"))
+            HideWindow();
+            _mainWindowViewModel.Init(this);
+            Top = 0;
+            Left = 0;
+        };
+    }
+
+    private void InitializeWebView2()
+    {
+        WebBrowser.CoreWebView2InitializationCompleted += (_, initializationCompletedArgs) =>
+        {
+            if (!initializationCompletedArgs.IsSuccess)
             {
-                await WebBrowser.ExecuteScriptAsync(
-                    "document.getElementById(\"searchbar\").remove(); " +
-                    "document.getElementById(\"ox-header\").remove(); " +
-                    "document.getElementById(\"topslot_container\").remove();");
-            }
-        }
-
-        private void CoreWebView2_WebResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs e)
-        {
-            // Check the request URL and decide whether to block it
-            string requestUrl = e.Request.Uri;
-            _logger.LogInformation(requestUrl);
-            if (ShouldBlockRequest(requestUrl))
-            {
-                // To block the request, set the Response to a new response with an appropriate status code
-                // For example, 404 Not Found or 204 No Content
-                _logger.LogInformation("Blocked");
-                e.Response = WebBrowser.CoreWebView2.Environment.CreateWebResourceResponse(null, 204, "Not Found", "");
-            }
-        }
-
-        private bool ShouldBlockRequest(string url)
-        {
-            // Implement your blocking logic here
-            // For example, block all requests to a specific domain
-            //return url.Contains(".ru") || url.Contains("amazon") || url.Contains("google-analytics");
-            var uri = new Uri(url);
-            var host = uri.Host;
-            string[] hostParts = host.Split('.');
-            string domain = hostParts.Length >= 2
-                ? string.Join(".", hostParts[hostParts.Length - 2], hostParts[hostParts.Length - 1])
-                : host;
-            return _blacklist.Contains(domain);
-        }
-
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            _hotkeyManager.RegisterHotKey();
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            _hotkeyManager.UnregisterHotKey();
-            ToastNotificationManagerCompat.History.Clear();
-            base.OnClosed(e);
-        }
-
-        private void TranslateFromClipboard()
-        {
-            if (!NotificationStateChecker.AreNotificationsAllowed())
-            {
-                _logger.LogInformation("Notifications are disabled");
+                _logger.LogError("CoreWebView2 initialization failed.");
                 return;
             }
 
-            (Left, Top) = _windowLocationManager.GetLeftAndTop();
-
-            var text = Clipboard.GetText().Trim();
-            
-            QueryTextBox.Text = text;
-
-            LoadingIndicator.Visibility = Visibility.Visible;
-            WebBrowser.Visibility = Visibility.Collapsed;
-
-            ShowWindow();
-
-            if (text.All(char.IsLetter))
+            WebBrowser.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+            WebBrowser.CoreWebView2.WebResourceRequested += (_, webResourceRequestedArgs) =>
             {
-                //TranslateFromText(text, _oxfordLoader);
-                NavigateToLoading();
-                NavigateToUrl($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
-            }
-            else
-            {
-                NavigateToPage(_pageBuilder.MakeInfoPage("Click a button if you really want to look up for this text."));
-            }
-
-            LoadingIndicator.Visibility = Visibility.Collapsed;
-            WebBrowser.Visibility = Visibility.Visible;
-        }
-
-        private void ShowWindow()
-        {
-            if (!IsVisible)
-            {
-                Show();
-            }
-
-            Activate();
-            Topmost = true;
-            Topmost = false;
-            Focus();
-        }
-
-        private void HideWindow()
-        {
-            if (IsVisible)
-            {
-                _loadingCts.Cancel();
-                NavigateToBlankPage();
-                Hide();
-            }
-        }
-
-        private void NavigateToBlankPage()
-        {
-            NavigateToUrl("about:blank");
-        }
-
-        private void NavigateToUrl(string url)
-        {
-            Application.Current.Dispatcher.BeginInvoke(async () =>
-            {
-                try
+                var requestUrl = webResourceRequestedArgs.Request.Uri;
+                _logger.LogInformation("Requested {Url}", requestUrl);
+                var blockResponse = _blocklistManager.TryBlock(requestUrl);
+                if (blockResponse != null)
                 {
-                    await WebBrowser.EnsureCoreWebView2Async();
-                    WebBrowser.CoreWebView2.Settings.IsScriptEnabled = true;
-                    _logger.LogInformation($"Navigating to {url}");
-                    WebBrowser.CoreWebView2.Navigate(url);
+                    _logger.LogInformation("Blocked");
+                    webResourceRequestedArgs.Response = WebBrowser.CoreWebView2.Environment
+                        .CreateWebResourceResponse(null, blockResponse.StatusCode, blockResponse.Reason, "");
                 }
-                catch (Exception e)
+            };
+
+            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, _) =>
+            {
+                var js = _jsSelector.SelectJs(WebBrowser.Source.AbsoluteUri);
+                if (js != null)
                 {
-                    _logger.LogError($"Failed to navigate to URL {url}.{Environment.NewLine}{e}");
+                    await WebBrowser.ExecuteScriptAsync(js);
                 }
-            });
+            };
+        };
+    }
+
+    private void ShowWindow()
+    {
+        if (!IsVisible)
+        {
+            Show();
         }
 
-        private void NavigateToLoading()
-        {
-            NavigateToPage(_pageBuilder.MakeInfoPage("Loading"));
-        }
-        
-        private void NavigateToPage(string page)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                try
-                {
-                    WebBrowser.NavigateToString(page);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError($"Failed to navigate to page.{Environment.NewLine}{e}");
-                }
-            });
-        }
+        Activate();
+        Topmost = true;
+        Topmost = false;
+        Focus();
+    }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+    private void HideWindow()
+    {
+        if (IsVisible)
         {
-            if (e.Key == Key.Escape)
+            NavigateToBlankPage();
+            Hide();
+        }
+    }
+
+    private void NavigateToBlankPage()
+    {
+        NavigateToUrl("about:blank");
+    }
+
+    private void NavigateToUrl(string url)
+    {
+        Application.Current.Dispatcher.BeginInvoke(async () =>
+        {
+            try
             {
-                HideWindow();
+                await WebBrowser.EnsureCoreWebView2Async();
+                WebBrowser.CoreWebView2.Settings.IsScriptEnabled = true;
+                _logger.LogInformation("Navigating to {Url}", url);
+                WebBrowser.CoreWebView2.Navigate(url);
             }
-        }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to navigate to the URL {Url}", url);
+            }
+        });
+    }
 
-        private void Window_Deactivated(object sender, EventArgs e)
+    private void NavigateToPage(string page)
+    {
+        Application.Current.Dispatcher.BeginInvoke(async () =>
+        {
+            try
+            {
+                await WebBrowser.EnsureCoreWebView2Async();
+                WebBrowser.NavigateToString(page);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to navigate to a page.");
+            }
+        });
+    }
+
+    private void Window_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape)
         {
             HideWindow();
         }
+    }
 
-        private void MenuItemExit_Click(object sender, RoutedEventArgs e)
-        {
-            _loadingCts.Cancel();
-            Application.Current.Shutdown();
-        }
-        
-        private void OxfordSearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            var text = QueryTextBox.Text;
-            NavigateToLoading();
-            NavigateToUrl($"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}");
-        }
-        
-        private void MultitranSearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            var text = QueryTextBox.Text;
-            NavigateToLoading();
-            NavigateToUrl($"https://www.multitran.com/m.exe?l1=1&l2=2&s={text}");
-        }
+    private void Window_Deactivated(object sender, EventArgs e)
+    {
+        HideWindow();
+    }
 
-        private void MenuItemTranslate_Click(object sender, RoutedEventArgs e)
-        {
-            TranslateFromClipboard();
-        }
+    private void MenuItemExit_Click(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Shutdown();
+    }
 
-        private async void WebBrowser_OnNavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
-        {
-            if (WebBrowser.Source.AbsoluteUri.Contains("oxford"))
-            {
-                await WebBrowser.ExecuteScriptAsync("document.getElementById(\"searchbar\").remove()");
-            }
-        }
-
-        private void DeeplSearchButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var text = QueryTextBox.Text;
-            NavigateToLoading();
-            NavigateToUrl($"https://www.deepl.com/translator#en/ru/{text}");
-        }
+    private void MenuItemTranslate_Click(object sender, RoutedEventArgs e)
+    {
+        _mainWindowViewModel.TranslateFromClipboard();
     }
 }

@@ -157,4 +157,7 @@ Click to open menu</value>
   <data name="Notification_FailedToAddHotkey" xml:space="preserve">
     <value>Failed to register Ctrl+Space as the hotkey for Translator.</value>
   </data>
+  <data name="Notification_SuspiciousText" xml:space="preserve">
+    <value>If you are really sure that you want to look up for this text, press a button.</value>
+  </data>
 </root>

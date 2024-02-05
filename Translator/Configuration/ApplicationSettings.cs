@@ -2,12 +2,9 @@ namespace Translator.Configuration;
 
 public class ApplicationSettings
 {
-    public string TestSetting { get; set; }
+    public SearchEngine[] SearchEngines { get; set; }
     
-    public Subsettings Subsettings { get; set; }
-}
-
-public class Subsettings
-{
-    public string TestSubsetting { get; set; }
+    public string[] AllowedFullscreenApps { get; set; }
+    
+    public string Culture { get; set; }
 }

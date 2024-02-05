@@ -132,6 +132,15 @@ namespace Translator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to If you are really sure that you want to look up for this text, press a button..
+        /// </summary>
+        public static string Notification_SuspiciousText {
+            get {
+                return ResourceManager.GetString("Notification_SuspiciousText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A word or an expression to translate.
         /// </summary>
         public static string QueryTextBox_Tooltip {

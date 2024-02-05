@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Translator.Configuration;
 
 namespace Translator;
 
@@ -11,13 +14,19 @@ namespace Translator;
 /// Allows to check whether showing a pop-up window is allowed.
 /// In particular, this checker allow to disable pop-ups when a fullscreen app is running (e.g. a video game).
 /// </summary>
-public static class NotificationStateChecker
+public class NotificationStateChecker
 {
-    private static readonly HashSet<string> AllowedFullScreenApps =
-    [
-        "firefox",
-        "foxit"
-    ];
+    private readonly ILogger<NotificationStateChecker> _logger;
+    private readonly HashSet<string> _allowedFullScreenApps;
+
+    public NotificationStateChecker(IOptions<ApplicationSettings> applicationSettings,
+        ILogger<NotificationStateChecker> logger)
+    {
+        _allowedFullScreenApps = new(applicationSettings.Value.AllowedFullscreenApps);
+        _logger = logger;
+        
+        _logger.LogInformation("Allowed fullscreen apps: {@apps}", _allowedFullScreenApps);
+    }
 
     /// <summary>
     /// Checks the state of the computer for the current user to determine whether sending a notification is appropriate.
@@ -44,18 +53,18 @@ public static class NotificationStateChecker
     /// <summary>
     /// Checks whether showing a pop-up window is allowed.
     /// </summary>
-    public static bool AreNotificationsAllowed()
+    public bool AreNotificationsAllowed()
     {
         try
         {
             var res = SHQueryUserNotificationState(out var state);
             if (res != 0)
             {
-                Console.WriteLine("SHQueryUserNotificationState. Invalid result: {res}");
+                _logger.LogError("SHQueryUserNotificationState. Invalid result: {Result}", res);
                 return false;
             }
 
-            Console.WriteLine($"SHQueryUserNotificationState returned {state}");
+            _logger.LogInformation("SHQueryUserNotificationState returned {State}", state);
 
             switch (state)
             {
@@ -71,9 +80,10 @@ public static class NotificationStateChecker
                         if (res != 0)
                         {
                             var process = Process.GetProcessById((int)pid);
-                            if (AllowedFullScreenApps.Any(a => process.ProcessName.Contains(a)))
+                            if (_allowedFullScreenApps.Any(a => process.ProcessName.Contains(a)))
                             {
-                                Console.WriteLine("An allowed fullscreen window is running");
+                                _logger.LogInformation(
+                                    "An allowed fullscreen window is running: {ProcessName}", process.ProcessName);
                                 return true;
                             }
                         }
@@ -85,7 +95,7 @@ public static class NotificationStateChecker
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception);
+            _logger.LogError(exception, "Failed to check whether notifications are allowed");
         }
 
         return false;
