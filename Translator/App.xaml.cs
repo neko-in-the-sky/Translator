@@ -20,7 +20,7 @@ namespace Translator
         public App()
         {
             var builder = Host.CreateApplicationBuilder();
-            
+
             builder.Services
                 .AddSingleton<HotkeyManager>()
                 .AddSingleton<PageBuilder>()
@@ -28,6 +28,7 @@ namespace Translator
                 .AddSingleton<BlocklistManager>()
                 .AddSingleton<JsSelector>()
                 .AddSingleton<MainWindowViewModel>()
+                .AddSingleton<PopupVisualManager>()
                 .AddSingleton<MainWindow>();
             
             builder.Logging

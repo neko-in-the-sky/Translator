@@ -16,13 +16,13 @@ public partial class MainWindow : Window
     private readonly BlocklistManager _blocklistManager;
     private readonly JsSelector _jsSelector;
     private readonly ILogger<MainWindow> _logger;
-    private readonly WindowLocationManager _windowLocationManager;
+    private readonly PopupVisualManager _popupVisualManager;
 
-    public MainWindow(MainWindowViewModel mainWindowViewModel, BlocklistManager blocklistManager,
-        JsSelector jsSelector, ILogger<MainWindow> logger)
+    public MainWindow(MainWindowViewModel mainWindowViewModel, PopupVisualManager popupVisualManager,
+        BlocklistManager blocklistManager, JsSelector jsSelector, ILogger<MainWindow> logger)
     {
         _mainWindowViewModel = mainWindowViewModel;
-        _windowLocationManager = new WindowLocationManager(this);
+        _popupVisualManager = popupVisualManager;
 
         _mainWindowViewModel.NavigationRequested += (args) =>
         {
@@ -30,7 +30,7 @@ public partial class MainWindow : Window
             {
                 if (args.IsFromHotkey)
                 {
-                    (Left, Top) = _windowLocationManager.GetLeftAndTop();
+                    (Left, Top) = _popupVisualManager.GetLeftAndTop(this);
                 }
 
                 ShowWindow();
@@ -105,6 +105,7 @@ public partial class MainWindow : Window
     {
         if (!IsVisible)
         {
+            (Width, Height) = _popupVisualManager.GetWidthAndHeight();
             Show();
         }
 

@@ -7,4 +7,6 @@ public class ApplicationSettings
     public string[] AllowedFullscreenApps { get; set; }
     
     public string Culture { get; set; }
+    
+    public PopupSettings Popup { get; set; }
 }
