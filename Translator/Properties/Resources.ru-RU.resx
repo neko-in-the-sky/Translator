@@ -148,4 +148,13 @@
     <value>Переводчик
 Нажмите, чтобы открыть меню</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Translator</value>
+  </data>
+  <data name="Notification_AddedHotkey" xml:space="preserve">
+    <value>Комбинация Ctrl+Space добавлена как горячая клавиша.</value>
+  </data>
+  <data name="Notification_FailedToAddHotkey" xml:space="preserve">
+    <value>Не удалось зарегистрировать Ctrl+Space в качестве горячей клавиши.</value>
+  </data>
 </root>

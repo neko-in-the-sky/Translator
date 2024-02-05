@@ -6,11 +6,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:p="clr-namespace:Translator.Properties"
     xmlns:tb="http://www.hardcodet.net/taskbar"
+    xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="{x:Static p:Resources.MainWindow_Title}"
     Width="650"
-    Height="Auto"
-    MinHeight="100"
-    MaxHeight="350"
+    Height="500"
     Deactivated="Window_Deactivated"
     KeyDown="Window_KeyDown"
     ResizeMode="NoResize"
@@ -55,6 +54,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox
                     Name="QueryTextBox"
@@ -64,15 +65,37 @@
                     FontSize="14"
                     ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}" />
                 <Button
-                    x:Name="SearchButton"
+                    x:Name="OxfordSearchButton"
                     Grid.Column="1"
                     Width="24"
                     Height="24"
                     Margin="5,0,0,0"
-                    Click="SearchButton_Click"
+                    Click="OxfordSearchButton_Click"
                     Style="{StaticResource FlatButtonStyle}"
                     ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
-                    <Image Source="/icons/Search_find_locate_1542_x32.ico" />
+                    <Image Source="/icons/oxford.ico" />
+                </Button>
+                <Button
+                    x:Name="MultitranSearchButton"
+                    Grid.Column="2"
+                    Width="24"
+                    Height="24"
+                    Margin="5,0,0,0"
+                    Click="MultitranSearchButton_Click"
+                    Style="{StaticResource FlatButtonStyle}"
+                    ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
+                    <Image Source="/icons/multitran.ico" />
+                </Button>
+                <Button
+                    x:Name="DeeplSearchButton"
+                    Grid.Column="3"
+                    Width="24"
+                    Height="24"
+                    Margin="5,0,0,0"
+                    Click="DeeplSearchButton_OnClick"
+                    Style="{StaticResource FlatButtonStyle}"
+                    ToolTip="{x:Static p:Resources.SearchButton_Tooltip}">
+                    <Image Source="/icons/deepl.ico" />
                 </Button>
             </Grid>
 
@@ -89,7 +112,8 @@
                     Text="{x:Static p:Resources.LoadingTextBlock_Text}" />
             </StackPanel>
 
-            <WebBrowser
+
+            <wpf:WebView2
                 Name="WebBrowser"
                 Grid.Row="1"
                 Margin="0,10,0,0"
@@ -97,7 +121,10 @@
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Visibility="Visible" />
+                Visibility="Visible"
+                NavigationCompleted="WebBrowser_OnNavigationCompleted"
+                 >
+            </wpf:WebView2>
         </Grid>
     </Border>
 </Window>

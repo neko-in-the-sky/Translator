@@ -7,28 +7,23 @@
             padding: 0px;
         }
 
-        td.gray {
-            background-color: #DBDBDB;
+        div.header {
+            background-color: lightskyblue;
             padding-top: 0.1em;
             padding-bottom: 0.1em;
             border-radius: 4px;
             padding-left: 0.2em;
         }
 
-        td.subj {
-            font-style: italic;
-            text-align: left;
-            vertical-align: text-top;
-        }
-
-        td.trans {
-            padding-left: 3px;
-            text-align: justify;
-            vertical-align: text-top;
+        div.error {
+            padding-top: 0.5em;
+            padding-bottom: 0.1em;
+            padding-left: 0.2em;
         }
     </style>
 </head>
 <body oncontextmenu="return false">
-    <div>{BODY}</div>
+    <div class="header">{HEADER}</div>
+    <div class="error">{BODY}</div>
 </body>
 </html>

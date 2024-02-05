@@ -3,73 +3,79 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Microsoft.Toolkit.Uwp.Notifications;
 
-namespace Translator
+namespace Translator;
+
+public class HotkeyManager(Window window, Action onHotkeyPressed)
 {
-    public class HotkeyManager
+    private const int HotkeyId = 0;
+
+    private const uint HotkeyModCtrl = 0x0002;
+    private const Key Hotkey = Key.Space;
+
+    /// <summary>
+    /// Posted when the user presses a hot key registered by the RegisterHotKey function. The message is placed at
+    /// the top of the message queue associated with the thread that registered the hot key.
+    /// See https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-hotkey".
+    /// </summary>
+    private const int WmHotkeyMessageId = 0x0312;
+
+    /// <summary>
+    /// Defines a system-wide hot key.
+    /// See https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-registerhotkey.
+    /// </summary>
+    [DllImport("User32.dll")]
+    private static extern bool RegisterHotKey(
+        [In] IntPtr hWnd,
+        [In] int id,
+        [In] uint fsModifiers,
+        [In] uint vk);
+
+    /// <summary>
+    /// Frees a hot key previously registered by the calling thread.
+    /// See https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unregisterhotkey.
+    /// </summary>
+    [DllImport("User32.dll")]
+    private static extern bool UnregisterHotKey(
+        [In] IntPtr hWnd,
+        [In] int id);
+
+    public void RegisterHotKey()
     {
-        private const int HOTKEY_ID = 9000;
+        var windowInteropHelper = new WindowInteropHelper(window);
+        var hwndSource = HwndSource.FromHwnd(windowInteropHelper.Handle);
+        hwndSource!.AddHook(HwndHook);
 
-        private readonly Window _window;
-        private readonly Action _onHotkeyPressed;
-
-        [DllImport("User32.dll")]
-        private static extern bool RegisterHotKey(
-            [In] IntPtr hWnd,
-            [In] int id,
-            [In] uint fsModifiers,
-            [In] uint vk);
-
-        [DllImport("User32.dll")]
-        private static extern bool UnregisterHotKey(
-            [In] IntPtr hWnd,
-            [In] int id);
-
-        public HotkeyManager(Window window, Action onHotkeyPressed)
+        var virtualKey = (uint)KeyInterop.VirtualKeyFromKey(Hotkey);
+        if (!RegisterHotKey(windowInteropHelper.Handle, HotkeyId, HotkeyModCtrl, virtualKey))
         {
-            _window = window;
-            _onHotkeyPressed = onHotkeyPressed;
+            new ToastContentBuilder()
+                .AddText(Properties.Resources.Notification_FailedToAddHotkey)
+                .Show();
+        }
+        else
+        {
+            new ToastContentBuilder()
+                .AddText(Properties.Resources.Notification_AddedHotkey)
+                .Show();
+        }
+    }
+
+    public void UnregisterHotKey()
+    {
+        var windowInteropHelper = new WindowInteropHelper(window);
+        UnregisterHotKey(windowInteropHelper.Handle, HotkeyId);
+    }
+
+    private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WmHotkeyMessageId && wParam.ToInt32() == HotkeyId)
+        {
+            onHotkeyPressed();
+            handled = true;
         }
 
-        public void RegisterHotKey()
-        {
-            var windowInteropHelper = new WindowInteropHelper(_window);
-            var hwndSource = HwndSource.FromHwnd(windowInteropHelper.Handle);
-            hwndSource.AddHook(HwndHook);
-
-            uint VK_C = (uint) KeyInterop.VirtualKeyFromKey(Key.Space);
-            const uint MOD_CTRL = 0x0002;
-            if (!RegisterHotKey(windowInteropHelper.Handle, HOTKEY_ID, MOD_CTRL, VK_C))
-            {
-                // TODO
-            }
-        }
-
-        public void UnregisterHotKey()
-        {
-            var helper = new WindowInteropHelper(_window);
-            UnregisterHotKey(helper.Handle, HOTKEY_ID);
-        }
-
-        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            const int WM_HOTKEY = 0x0312;
-
-            switch (msg)
-            {
-                case WM_HOTKEY:
-                    switch (wParam.ToInt32())
-                    {
-                        case HOTKEY_ID:
-                            _onHotkeyPressed();
-                            handled = true;
-                            break;
-                    }
-
-                    break;
-            }
-
-            return IntPtr.Zero;
-        }
+        return IntPtr.Zero;
     }
 }

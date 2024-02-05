@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>icons\sidebar_sites_earth_world_globe_20458_all.ico</ApplicationIcon>
     <Platforms>AnyCPU</Platforms>
@@ -15,16 +15,35 @@
   <ItemGroup>
     <None Remove="icons\Search_find_locate_1542_x32.ico" />
     <None Remove="icons\sidebar_sites_earth_world_globe_20458_all.ico" />
+    <None Update="Templates\info_template.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Blocklist\ads.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Blocklist\my.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Blocklist\tracking.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.14" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.28" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="icons\Search_find_locate_1542_x32.ico" />
     <Resource Include="icons\sidebar_sites_earth_world_globe_20458_all.ico" />
+    <None Remove="icons\multitran.ico" />
+    <Resource Include="icons\multitran.ico" />
+    <None Remove="icons\oxford.ico" />
+    <Resource Include="icons\oxford.ico" />
+    <None Remove="icons\deepl.ico" />
+    <Resource Include="icons\deepl.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,9 +65,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Templates\translation_template.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Templates\error_template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

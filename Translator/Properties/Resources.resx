@@ -148,4 +148,13 @@
     <value>Translator
 Click to open menu</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Translator</value>
+  </data>
+  <data name="Notification_AddedHotkey" xml:space="preserve">
+    <value>Successfully added Ctrl+Space as the hotkey.</value>
+  </data>
+  <data name="Notification_FailedToAddHotkey" xml:space="preserve">
+    <value>Failed to register Ctrl+Space as the hotkey for Translator.</value>
+  </data>
 </root>
