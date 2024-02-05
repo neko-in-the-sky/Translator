@@ -5,8 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Web.WebView2.Core;
+using Translator.Configuration;
 
 namespace Translator
 {
@@ -15,14 +18,16 @@ namespace Translator
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ILogger<MainWindow> _logger;
         private readonly HotkeyManager _hotkeyManager;
         private readonly WindowLocationManager _windowLocationManager;
         private readonly HashSet<string> _blacklist = new();
         private CancellationTokenSource _loadingCts = new();
         private readonly PageBuilder _pageBuilder = new();
-        
-        public MainWindow()
+
+        public MainWindow(ILogger<MainWindow> logger, IOptions<ApplicationSettings> applicationSettings)
         {
+            _logger = logger;
             InitializeComponent();
             _hotkeyManager = new HotkeyManager(this, TranslateFromClipboard);
             _windowLocationManager = new WindowLocationManager(this);
@@ -90,12 +95,12 @@ namespace Translator
         {
             // Check the request URL and decide whether to block it
             string requestUrl = e.Request.Uri;
-            Console.WriteLine(requestUrl);
+            _logger.LogInformation(requestUrl);
             if (ShouldBlockRequest(requestUrl))
             {
                 // To block the request, set the Response to a new response with an appropriate status code
                 // For example, 404 Not Found or 204 No Content
-                Console.WriteLine("Blocked");
+                _logger.LogInformation("Blocked");
                 e.Response = WebBrowser.CoreWebView2.Environment.CreateWebResourceResponse(null, 204, "Not Found", "");
             }
         }
@@ -131,7 +136,7 @@ namespace Translator
         {
             if (!NotificationStateChecker.AreNotificationsAllowed())
             {
-                Console.WriteLine("Notifications are disabled");
+                _logger.LogInformation("Notifications are disabled");
                 return;
             }
 
@@ -197,12 +202,12 @@ namespace Translator
                 {
                     await WebBrowser.EnsureCoreWebView2Async();
                     WebBrowser.CoreWebView2.Settings.IsScriptEnabled = true;
-                    Console.WriteLine($"Navigating to {url}");
+                    _logger.LogInformation($"Navigating to {url}");
                     WebBrowser.CoreWebView2.Navigate(url);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Failed to navigate to URL {url}.{Environment.NewLine}{e}");
+                    _logger.LogError($"Failed to navigate to URL {url}.{Environment.NewLine}{e}");
                 }
             });
         }
@@ -222,7 +227,7 @@ namespace Translator
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Failed to navigate to page.{Environment.NewLine}{e}");
+                    _logger.LogError($"Failed to navigate to page.{Environment.NewLine}{e}");
                 }
             });
         }
