@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>icons\sidebar_sites_earth_world_globe_20458_all.ico</ApplicationIcon>
+    <ApplicationIcon>icons\stack-of-books.ico</ApplicationIcon>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <None Remove="icons\Search_find_locate_1542_x32.ico" />
-    <None Remove="icons\sidebar_sites_earth_world_globe_20458_all.ico" />
     <None Update="Templates\info_template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -40,10 +39,13 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2210.55" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="icons\sidebar_sites_earth_world_globe_20458_all.ico" />
     <None Remove="icons\multitran.ico" />
     <Resource Include="icons\multitran.ico" />
     <None Remove="icons\oxford.ico" />
@@ -52,6 +54,8 @@
     <Resource Include="icons\deepl.ico" />
     <None Remove="icons\urban_dictionary.ico" />
     <Resource Include="icons\urban_dictionary.ico" />
+    <None Remove="icons\stack-of-books.ico" />
+    <Resource Include="icons\stack-of-books.ico" />
   </ItemGroup>
 
   <ItemGroup>

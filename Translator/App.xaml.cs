@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Serilog;
 using Translator.Blocklist;
 using Translator.Configuration;
 
@@ -31,9 +32,11 @@ namespace Translator
                 .AddSingleton<PopupVisualManager>()
                 .AddSingleton<MainWindow>();
             
-            builder.Logging
-                .ClearProviders()
-                .AddSimpleConsole();
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .CreateLogger();
+            builder.Logging.ClearProviders();
+            builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             builder.Services.Configure<ApplicationSettings>(
                 builder.Configuration.GetSection(key: nameof(ApplicationSettings)));

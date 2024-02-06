@@ -36,7 +36,7 @@
             </Grid.RowDefinitions>
 
             <tb:TaskbarIcon
-                IconSource="/icons/sidebar_sites_earth_world_globe_20458_all.ico"
+                IconSource="/icons/stack-of-books.ico"
                 MenuActivation="LeftOrRightClick"
                 ToolTipText="{x:Static p:Resources.TrayIcon_TooltipText}"
                 Visibility="Visible">
