@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,31 +22,46 @@ namespace Translator
 
         public App()
         {
-            var builder = Host.CreateApplicationBuilder();
+            try
+            {
+                Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+                
+                var builder = Host.CreateApplicationBuilder();
 
-            builder.Services
-                .AddSingleton<HotkeyManager>()
-                .AddSingleton<PageBuilder>()
-                .AddSingleton<NotificationStateChecker>()
-                .AddSingleton<BlocklistManager>()
-                .AddSingleton<JsSelector>()
-                .AddSingleton<MainWindowViewModel>()
-                .AddSingleton<PopupVisualManager>()
-                .AddSingleton<MainWindow>();
-            
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .CreateLogger();
-            builder.Logging.ClearProviders();
-            builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+                builder.Services
+                    .AddSingleton<HotkeyManager>()
+                    .AddSingleton<PageBuilder>()
+                    .AddSingleton<NotificationStateChecker>()
+                    .AddSingleton<BlocklistManager>()
+                    .AddSingleton<JsSelector>()
+                    .AddSingleton<MainWindowViewModel>()
+                    .AddSingleton<PopupVisualManager>()
+                    .AddSingleton<MainWindow>();
 
-            builder.Services.Configure<ApplicationSettings>(
-                builder.Configuration.GetSection(key: nameof(ApplicationSettings)));
-            
-            _host = builder.Build();
+                Log.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .CreateLogger();
+                builder.Logging.ClearProviders();
+                builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
-            CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(
+                builder.Services.Configure<ApplicationSettings>(
+                    builder.Configuration.GetSection(key: nameof(ApplicationSettings)));
+
+                _host = builder.Build();
+                
+                Application.Current.DispatcherUnhandledException += (_, args) =>
+                {
+                    Log.Logger.Error(args.Exception, "Unhandled exception");
+                };
+
+                CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(
                     _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.Culture);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.ToString());
+                Application.Current.Shutdown(-1);
+            }
         }
 
         private async void App_OnStartup(object sender, StartupEventArgs e)
