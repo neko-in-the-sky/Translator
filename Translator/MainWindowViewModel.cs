@@ -132,7 +132,11 @@ public class NavigationButtonViewModel
         _action = action;
         _query = query;
         _searchEngine = searchEngine;
-        _autoSearchRegex = new Regex(searchEngine.AutoSearchRegex);
+        if (!string.IsNullOrEmpty(searchEngine.AutoSearchRegex))
+        {
+            _autoSearchRegex = new Regex(searchEngine.AutoSearchRegex);
+        }
+
         IconFilePath = Path.Combine("icons", searchEngine.IconFileName);
         Command = new NavigateCommand(this);
     }
@@ -143,7 +147,7 @@ public class NavigationButtonViewModel
 
     public string ToolTip => _searchEngine.Name;
 
-    public bool CanAutoSearch(string query) => _autoSearchRegex.IsMatch(query);
+    public bool CanAutoSearch(string query) => _autoSearchRegex != null && _autoSearchRegex.IsMatch(query);
     
     private class NavigateCommand(NavigationButtonViewModel parent) : ICommand
     {

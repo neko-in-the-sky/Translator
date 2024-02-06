@@ -17,7 +17,7 @@
     ShowInTaskbar="False"
     WindowStartupLocation="Manual"
     WindowStyle="None"
-    d:DataContext="{d:DesignData Type=translator:MainWindowViewModel}"
+    d:DataContext="{d:DesignInstance Type=translator:MainWindowViewModel, IsDesignTimeCreatable=False}"
     mc:Ignorable="d">
 
     <Window.Resources>
