@@ -9,4 +9,6 @@ public class SearchEngine
     public string IconFileName { get; set; }
     
     public string JsFileName { get; set; }
+    
+    public string AutoSearchRegex { get; set; }
 }

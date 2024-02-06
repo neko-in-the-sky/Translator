@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -19,6 +19,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly HotkeyManager _hotkeyManager;
     private readonly NotificationStateChecker _notificationStateChecker;
     private readonly PageBuilder _pageBuilder;
+    private readonly NavigationButtonViewModel _defaultButton;
     private readonly ILogger<MainWindowViewModel> _logger;
     private string _queryText;
 
@@ -33,7 +34,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SearchCommands = new();
         foreach (var searchEngine in applicationSettings.Value.SearchEngines)
         {
-            SearchCommands.Add(new NavigationButtonViewModel(RequestNavigation, () => QueryText, searchEngine));
+            var command = new NavigationButtonViewModel(RequestNavigation, () => QueryText, searchEngine);
+            SearchCommands.Add(command);
+            if (searchEngine.Name == applicationSettings.Value.DefaultSearchEngine)
+            {
+                _defaultButton = command;
+            }
         }
     }
 
@@ -62,13 +68,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         var text = Clipboard.GetText().Trim();
         QueryText = text;
 
-        if (text.All(char.IsLetter))
+        if (_defaultButton.CanAutoSearch(text))
         {
-            NavigationRequested?.Invoke(new NavigationRequestedEventArgs
-            {
-                Url = $"https://www.oxfordlearnersdictionaries.com/search/english/?q={text}",
-                IsFromHotkey = true
-            });
+            _defaultButton.Command.Execute(true);
         }
         else
         {
@@ -117,34 +119,31 @@ public class NavigationRequestedEventArgs : EventArgs
     public bool IsFromHotkey { get; init; }
 }
 
-public class NavigationOptions
-{
-    public string Url { get; set; }
-}
-
 public class NavigationButtonViewModel
 {
-    public string UrlTemplate { get; }
-    
     private readonly Action<NavigationRequestedEventArgs> _action;
     private readonly Func<string> _query;
+    private readonly SearchEngine _searchEngine;
+    private readonly Regex _autoSearchRegex;
 
     public NavigationButtonViewModel(Action<NavigationRequestedEventArgs> action, Func<string> query,
         SearchEngine searchEngine)
     {
-        UrlTemplate = searchEngine.UrlTemplate;
         _action = action;
         _query = query;
+        _searchEngine = searchEngine;
+        _autoSearchRegex = new Regex(searchEngine.AutoSearchRegex);
         IconFilePath = Path.Combine("icons", searchEngine.IconFileName);
-        ToolTip = searchEngine.Name;
         Command = new NavigateCommand(this);
     }
     
     public ICommand Command { get; }
     
     public string IconFilePath { get; }
-    
-    public string ToolTip { get; }
+
+    public string ToolTip => _searchEngine.Name;
+
+    public bool CanAutoSearch(string query) => _autoSearchRegex.IsMatch(query);
     
     private class NavigateCommand(NavigationButtonViewModel parent) : ICommand
     {
@@ -154,7 +153,8 @@ public class NavigationButtonViewModel
         {
             parent._action?.Invoke(new NavigationRequestedEventArgs
             {
-                Url = string.Format(parent.UrlTemplate, parent._query())
+                Url = string.Format(parent._searchEngine.UrlTemplate, parent._query()),
+                IsFromHotkey = parameter is true
             });
             
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
