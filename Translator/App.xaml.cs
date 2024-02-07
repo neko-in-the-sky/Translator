@@ -33,7 +33,7 @@ namespace Translator
                     .AddSingleton<PageBuilder>()
                     .AddSingleton<NotificationStateChecker>()
                     .AddSingleton<BlocklistManager>()
-                    .AddSingleton<JsSelector>()
+                    .AddSingleton<JavaScriptProvider>()
                     .AddSingleton<MainWindowViewModel>()
                     .AddSingleton<PopupSizeLocationProvider>()
                     .AddSingleton<MainWindow>();

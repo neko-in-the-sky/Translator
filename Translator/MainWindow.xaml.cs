@@ -14,12 +14,12 @@ public partial class MainWindow : Window
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly BlocklistManager _blocklistManager;
-    private readonly JsSelector _jsSelector;
+    private readonly JavaScriptProvider _javaScriptProvider;
     private readonly ILogger<MainWindow> _logger;
     private readonly PopupSizeLocationProvider _popupSizeLocationProvider;
 
     public MainWindow(MainWindowViewModel mainWindowViewModel, PopupSizeLocationProvider popupSizeLocationProvider,
-        BlocklistManager blocklistManager, JsSelector jsSelector, ILogger<MainWindow> logger)
+        BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, ILogger<MainWindow> logger)
     {
         _mainWindowViewModel = mainWindowViewModel;
         _popupSizeLocationProvider = popupSizeLocationProvider;
@@ -47,7 +47,7 @@ public partial class MainWindow : Window
         };
 
         _blocklistManager = blocklistManager;
-        _jsSelector = jsSelector;
+        _javaScriptProvider = javaScriptProvider;
         _logger = logger;
 
         InitializeComponent();
@@ -92,7 +92,7 @@ public partial class MainWindow : Window
 
             WebBrowser.CoreWebView2.DOMContentLoaded += async (_, _) =>
             {
-                var js = _jsSelector.SelectJs(WebBrowser.Source.AbsoluteUri);
+                var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
                 if (js != null)
                 {
                     await WebBrowser.ExecuteScriptAsync(js);
