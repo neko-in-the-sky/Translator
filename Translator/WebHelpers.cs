@@ -8,8 +8,8 @@ public static class WebHelpers
     {
         var host = uri.Host;
         var hostParts = host.Split('.');
-        var domain = hostParts.Length >= 2
-            ? string.Join(".", hostParts[hostParts.Length - 2], hostParts[hostParts.Length - 1])
+        var domain = hostParts.Length > 2
+            ? string.Join('.', hostParts[^2], hostParts[^1])
             : host;
         return domain;
     }

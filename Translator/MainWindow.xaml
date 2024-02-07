@@ -92,20 +92,6 @@
                 </ItemsControl>
             </Grid>
 
-            <StackPanel
-                Name="LoadingIndicator"
-                Grid.Row="1"
-                VerticalAlignment="Center">
-
-                <TextBlock
-                    Margin="0,5,0,0"
-                    HorizontalAlignment="Center"
-                    FontSize="12"
-                    FontStyle="Italic"
-                    Text="{x:Static p:Resources.LoadingTextBlock_Text}" />
-            </StackPanel>
-
-
             <wpf:WebView2
                 Name="WebBrowser"
                 Grid.Row="1"
@@ -113,8 +99,7 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Visibility="Visible">
+                ScrollViewer.VerticalScrollBarVisibility="Visible">
             </wpf:WebView2>
         </Grid>
     </Border>

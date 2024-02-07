@@ -117,26 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Error_CannotTranslate" xml:space="preserve">
-    <value>Не получилось перевести :(</value>
-  </data>
-  <data name="Error_ClipboardIsEmpty" xml:space="preserve">
-    <value>Скопируйте текст, который нужно перевести, с помощью контестного меню или комбинацией клавиш Ctrl+C</value>
-  </data>
-  <data name="Error_NotFound" xml:space="preserve">
-    <value>В словарях ничего не найдено</value>
-  </data>
-  <data name="LoadingTextBlock_Text" xml:space="preserve">
-    <value>Идет поиск...</value>
-  </data>
   <data name="MainWindow_Title" xml:space="preserve">
     <value>Переводчик</value>
   </data>
   <data name="QueryTextBox_Tooltip" xml:space="preserve">
     <value>Слово или выражение для перевода</value>
-  </data>
-  <data name="SearchButton_Tooltip" xml:space="preserve">
-    <value>Найти в словарях</value>
   </data>
   <data name="TrayIcon_MenuItem_Exit" xml:space="preserve">
     <value>Выйти</value>

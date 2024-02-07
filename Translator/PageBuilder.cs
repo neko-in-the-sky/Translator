@@ -2,6 +2,9 @@ using System.IO;
 
 namespace Translator;
 
+/// <summary>
+/// Creates an HTML page with specified information.
+/// </summary>
 public class PageBuilder
 {
     private const string BodyPlaceHolder = "{BODY}";

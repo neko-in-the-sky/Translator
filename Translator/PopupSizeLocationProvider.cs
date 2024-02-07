@@ -11,8 +11,8 @@ namespace Translator;
 /// <summary>
 /// Determines the location and the size of the pop-up.
 /// </summary>
-public class PopupVisualManager(
-    ILogger<PopupVisualManager> logger,
+public class PopupSizeLocationProvider(
+    ILogger<PopupSizeLocationProvider> logger,
     IOptions<ApplicationSettings> applicationSettings)
 {
     private readonly PopupSettings _popupSettings = applicationSettings.Value.Popup;
@@ -31,7 +31,6 @@ public class PopupVisualManager(
     public (double, double) GetLeftAndTop(Window window)
     {
         var (screenWidth, screenHeight) = GetScreenWidthAndHeight();
-
         GetCursorPos(out var cursorPositionPixels);
         var mousePosition = ScreenPixelsToDip(cursorPositionPixels, window);
 

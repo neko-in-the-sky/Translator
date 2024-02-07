@@ -117,26 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Error_CannotTranslate" xml:space="preserve">
-    <value>Cannot translate this :(</value>
-  </data>
-  <data name="Error_ClipboardIsEmpty" xml:space="preserve">
-    <value>Copy text you want to translate using context menu or Ctrl+C</value>
-  </data>
-  <data name="Error_NotFound" xml:space="preserve">
-    <value>Nothing found in dictionaries</value>
-  </data>
-  <data name="LoadingTextBlock_Text" xml:space="preserve">
-    <value>Searching...</value>
-  </data>
   <data name="MainWindow_Title" xml:space="preserve">
     <value>Translator</value>
   </data>
   <data name="QueryTextBox_Tooltip" xml:space="preserve">
     <value>A word or an expression to translate</value>
-  </data>
-  <data name="SearchButton_Tooltip" xml:space="preserve">
-    <value>Search in dictionaries</value>
   </data>
   <data name="TrayIcon_MenuItem_Exit" xml:space="preserve">
     <value>Exit</value>

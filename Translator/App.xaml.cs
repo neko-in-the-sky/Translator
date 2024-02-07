@@ -35,7 +35,7 @@ namespace Translator
                     .AddSingleton<BlocklistManager>()
                     .AddSingleton<JsSelector>()
                     .AddSingleton<MainWindowViewModel>()
-                    .AddSingleton<PopupVisualManager>()
+                    .AddSingleton<PopupSizeLocationProvider>()
                     .AddSingleton<MainWindow>();
 
                 Log.Logger = new LoggerConfiguration()

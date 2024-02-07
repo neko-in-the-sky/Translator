@@ -69,42 +69,6 @@ namespace Translator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot translate this :(.
-        /// </summary>
-        public static string Error_CannotTranslate {
-            get {
-                return ResourceManager.GetString("Error_CannotTranslate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy text you want to translate using context menu or Ctrl+C.
-        /// </summary>
-        public static string Error_ClipboardIsEmpty {
-            get {
-                return ResourceManager.GetString("Error_ClipboardIsEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Nothing found in dictionaries.
-        /// </summary>
-        public static string Error_NotFound {
-            get {
-                return ResourceManager.GetString("Error_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Searching....
-        /// </summary>
-        public static string LoadingTextBlock_Text {
-            get {
-                return ResourceManager.GetString("LoadingTextBlock_Text", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Translator.
         /// </summary>
         public static string MainWindow_Title {
@@ -146,15 +110,6 @@ namespace Translator.Properties {
         public static string QueryTextBox_Tooltip {
             get {
                 return ResourceManager.GetString("QueryTextBox_Tooltip", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Search in dictionaries.
-        /// </summary>
-        public static string SearchButton_Tooltip {
-            get {
-                return ResourceManager.GetString("SearchButton_Tooltip", resourceCulture);
             }
         }
         
