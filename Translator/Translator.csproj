@@ -32,6 +32,9 @@
     <None Update="js\oxford.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="js\free_dictionary.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +59,8 @@
     <Resource Include="icons\urban_dictionary.ico" />
     <None Remove="icons\stack-of-books.ico" />
     <Resource Include="icons\stack-of-books.ico" />
+    <None Remove="icons\free_dictionary.ico" />
+    <Resource Include="icons\free_dictionary.ico" />
   </ItemGroup>
 
   <ItemGroup>
