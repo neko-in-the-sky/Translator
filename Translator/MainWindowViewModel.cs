@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -65,7 +67,12 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             return;
         }
 
-        var text = Clipboard.GetText().Trim();
+        var text = GetTextFromClipboard();
+        if (text == null)
+        {
+            return;
+        }
+
         QueryText = text;
 
         if (_defaultButton.CanAutoSearch(text))
@@ -81,6 +88,24 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
                 IsFromHotkey = true
             });
         }
+    }
+
+    private string GetTextFromClipboard()
+    {
+        for (var i = 0; i < 3; i++)
+        {
+            try
+            {
+                return Clipboard.GetText().Trim();
+            }
+            catch (COMException exception)
+            {
+                _logger.LogError(exception, "Error while getting text from the clipboard");
+                Task.Delay(TimeSpan.FromMilliseconds(150));
+            }
+        }
+
+        return null;
     }
 
     private void RequestNavigation(NavigationRequestedEventArgs args)
