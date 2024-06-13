@@ -61,12 +61,13 @@
                 </Grid.ColumnDefinitions>
                 <TextBox
                     Name="QueryTextBox"
-                    Text="{Binding Path=QueryText}"
+                    Text="{Binding Path=QueryText, UpdateSourceTrigger=PropertyChanged}"
                     Grid.Column="0"
                     Height="25"
                     VerticalContentAlignment="Center"
                     FontSize="14"
-                    ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}" />
+                    ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}"
+                    KeyDown="QueryTextBox_KeyDown" />
                 
                 <ItemsControl ItemsSource="{Binding SearchCommands}"
                               Grid.Column="1">
@@ -78,7 +79,6 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button
-                                x:Name="OxfordSearchButton"
                                 Width="24"
                                 Height="24"
                                 Margin="5,0,0,0"

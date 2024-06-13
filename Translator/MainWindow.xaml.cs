@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -112,7 +113,7 @@ public partial class MainWindow : Window
         Activate();
         Topmost = true;
         Topmost = false;
-        Focus();
+        QueryTextBox.Focus();
     }
 
     private void HideWindow()
@@ -184,5 +185,13 @@ public partial class MainWindow : Window
     private void MenuItemTranslate_Click(object sender, RoutedEventArgs e)
     {
         _mainWindowViewModel.TranslateFromClipboard();
+    }
+
+    private void QueryTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            _mainWindowViewModel.SearchCommands.First().Command.Execute(null);
+        }
     }
 }
