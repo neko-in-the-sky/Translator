@@ -85,7 +85,7 @@ public class NotificationStateChecker
                         if (res != 0)
                         {
                             var process = Process.GetProcessById((int)pid);
-                            if (_allowedFullScreenApps.Any(a => process.ProcessName.Contains(a)))
+                            if (_allowedFullScreenApps.Any(a => process.ProcessName.ToLower().Contains(a.ToLower())))
                             {
                                 _logger.LogInformation(
                                     "An allowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
