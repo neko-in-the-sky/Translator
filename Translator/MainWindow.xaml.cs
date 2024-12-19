@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -185,6 +188,20 @@ public partial class MainWindow : Window
     private void MenuItemTranslate_Click(object sender, RoutedEventArgs e)
     {
         _mainWindowViewModel.TranslateFromClipboard();
+    }
+
+    private void MenuItemOpenFolder_Click(object sender, RoutedEventArgs e)
+    {
+        string exePath = Assembly.GetExecutingAssembly().Location;
+        string directoryPath = Path.GetDirectoryName(exePath);
+        if (!string.IsNullOrEmpty(directoryPath))
+        {
+            Process.Start("explorer.exe", directoryPath);
+        }
+        else
+        {
+            _logger.LogWarning("Unable to locate the directory of the current application.");
+        }
     }
 
     private void QueryTextBox_KeyDown(object sender, KeyEventArgs e)

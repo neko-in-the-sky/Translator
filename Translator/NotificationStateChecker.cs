@@ -71,11 +71,16 @@ public class NotificationStateChecker
                 case QueryUserNotificationState.QunsAcceptsNotifications:
                 case QueryUserNotificationState.QunsQuietTime:
                     return true;
+                case QueryUserNotificationState.QunsRunningD3DFullScreen:
+                    return false;
                 case QueryUserNotificationState.QunsBusy:
-                {
-                    var hWnd = GetForegroundWindow();
-                    if (hWnd != 0)
                     {
+                        var hWnd = GetForegroundWindow();
+                        if (hWnd == 0)
+                        {
+                            _logger.LogInformation("No foreground window found");
+                            return true;
+                        }
                         res = GetWindowThreadProcessId(hWnd, out var pid);
                         if (res != 0)
                         {
@@ -83,14 +88,19 @@ public class NotificationStateChecker
                             if (_allowedFullScreenApps.Any(a => process.ProcessName.Contains(a)))
                             {
                                 _logger.LogInformation(
-                                    "An allowed fullscreen window is running: {ProcessName}", process.ProcessName);
+                                    "An allowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
                                 return true;
                             }
+                            else
+                            {
+                                _logger.LogInformation(
+                                   "A disallowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
+                                return false;
+                            }
                         }
-                    }
 
-                    break;
-                }
+                        break;
+                    }
             }
         }
         catch (Exception exception)
