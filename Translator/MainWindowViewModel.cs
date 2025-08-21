@@ -47,7 +47,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     public void Init(Window window)
     {
-        _hotkeyManager.Init(window, TranslateFromClipboard);
+        _hotkeyManager.Init(window, () => TranslateFromClipboard(fromHotKey: true));
         _hotkeyManager.RegisterHotKey();
     }
 
@@ -59,7 +59,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     public event Action<NavigationRequestedEventArgs> NavigationRequested;
 
-    public void TranslateFromClipboard()
+    public void TranslateFromClipboard(bool fromHotKey)
     {
         if (!_notificationStateChecker.AreNotificationsAllowed())
         {

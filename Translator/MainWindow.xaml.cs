@@ -187,7 +187,7 @@ public partial class MainWindow : Window
 
     private void MenuItemTranslate_Click(object sender, RoutedEventArgs e)
     {
-        _mainWindowViewModel.TranslateFromClipboard();
+        _mainWindowViewModel.TranslateFromClipboard(fromHotKey: false);
     }
 
     private void MenuItemOpenFolder_Click(object sender, RoutedEventArgs e)
