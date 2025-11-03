@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="icons\germany_flag.ico" />
     <None Remove="icons\Search_find_locate_1542_x32.ico" />
     <None Update="Templates\info_template.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -53,6 +54,7 @@
 
   <ItemGroup>
     <None Remove="icons\multitran.ico" />
+    <Resource Include="icons\germany_flag.ico" />
     <Resource Include="icons\multitran.ico" />
     <None Remove="icons\oxford.ico" />
     <Resource Include="icons\oxford.ico" />
