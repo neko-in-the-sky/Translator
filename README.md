@@ -4,6 +4,8 @@ A tray-resident pop-up dictionary for Windows. Copy a word, press <kbd>Ctrl</kbd
 and a small always-on-top window appears next to the cursor with that word already looked up.
 Press <kbd>Esc</kbd> or click away and it disappears.
 
+![The pop-up over a Wikipedia article, showing the Oxford Learner's Dictionaries entry for "cat" with the search box and the seven engine buttons along the top.](docs/main_window.jpg)
+
 ## Install
 
 Download the latest `Translator-<version>-win-x64.zip` from
