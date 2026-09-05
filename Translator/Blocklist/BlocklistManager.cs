@@ -14,11 +14,14 @@ public class BlocklistManager
         {
             foreach (var line in File.ReadLines(file))
             {
-                if (line.StartsWith('#'))
+                var trimmed = line.Trim();
+                if (trimmed.Length == 0 || trimmed.StartsWith('#'))
                     continue;
-                var address = line;
-                if (!file.EndsWith("my.txt"))
-                    address = address.Split(' ')[1];
+
+                // The hosts-format lists use "0.0.0.0 example.com" while my.txt holds bare
+                // domains. Taking the last whitespace-separated token handles both, and no
+                // longer throws on the blank lines the upstream lists now contain.
+                var address = trimmed.Split((char[])null, StringSplitOptions.RemoveEmptyEntries)[^1];
                 _blocklist.Add(address);
             }
         }
