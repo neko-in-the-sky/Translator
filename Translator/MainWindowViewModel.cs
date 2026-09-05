@@ -6,7 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -18,6 +18,9 @@ namespace Translator;
 
 public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 {
+    private const int ClipboardAttempts = 3;
+    private static readonly TimeSpan ClipboardRetryDelay = TimeSpan.FromMilliseconds(150);
+
     private readonly HotkeyManager _hotkeyManager;
     private readonly NotificationStateChecker _notificationStateChecker;
     private readonly PageBuilder _pageBuilder;
@@ -92,7 +95,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     private string GetTextFromClipboard()
     {
-        for (var i = 0; i < 3; i++)
+        for (var attempt = 1; attempt <= ClipboardAttempts; attempt++)
         {
             try
             {
@@ -100,8 +103,15 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             }
             catch (COMException exception)
             {
-                _logger.LogError(exception, "Error while getting text from the clipboard");
-                Task.Delay(TimeSpan.FromMilliseconds(150));
+                _logger.LogError(exception,
+                    "Error while getting text from the clipboard (attempt {Attempt} of {Total})",
+                    attempt, ClipboardAttempts);
+
+                // Clipboard.GetText requires STA, so the retry stays on the UI thread.
+                if (attempt < ClipboardAttempts)
+                {
+                    Thread.Sleep(ClipboardRetryDelay);
+                }
             }
         }
 
