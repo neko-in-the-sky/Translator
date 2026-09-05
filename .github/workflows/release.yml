@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, without the leading v (e.g. 1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version
+        id: v
+        shell: pwsh
+        run: |
+          $tag = if ('${{ github.event_name }}' -eq 'push') { '${{ github.ref_name }}' } else { 'v${{ inputs.version }}' }
+          $version = $tag -replace '^v', ''
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Expected a version like 1.0.0, got '$version'" }
+          "tag=$tag"         | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          "version=$version" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          Write-Host "Building $tag (assembly version $version)"
+
+      # Do NOT add -p:IncludeNativeLibrariesForSelfExtract=true here. It silently
+      # drops Blocklist/ads.txt from the publish output (154k ad domains), which
+      # disables ad blocking at runtime with no error. Saves 9 MB, costs a feature.
+      - name: Publish self-contained win-x64
+        run: >
+          dotnet publish Translator/Translator.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:EnableCompressionInSingleFile=true
+          -p:Version=${{ steps.v.outputs.version }}
+          -o publish
+
+      - name: Verify payload
+        shell: pwsh
+        run: |
+          # The app reads these from disk at runtime relative to AppContext.BaseDirectory.
+          # If any are missing the app still starts but silently loses blocklisting or page cleanup.
+          $required = @(
+            'Translator.exe'
+            'appsettings.json'
+            'Blocklist/ads.txt'
+            'Blocklist/my.txt'
+            'Blocklist/tracking.txt'
+            'js/oxford.js'
+            'js/free_dictionary.js'
+            'js/spanishdict.js'
+            'templates/info_template.html'
+          )
+          $missing = $required | Where-Object { -not (Test-Path "publish/$_") }
+          if ($missing) { throw "Missing from publish output: $($missing -join ', ')" }
+          Get-ChildItem publish -Recurse -File | ForEach-Object { "{0,10:N0}  {1}" -f $_.Length, $_.FullName.Replace("$PWD\publish\", '') }
+
+      - name: Package
+        id: pkg
+        shell: pwsh
+        run: |
+          Remove-Item publish/*.pdb -ErrorAction SilentlyContinue
+          $name = "Translator-${{ steps.v.outputs.version }}-win-x64.zip"
+          Compress-Archive -Path publish/* -DestinationPath $name
+          "name=$name" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
+          "{0:N1} MB" -f ((Get-Item $name).Length / 1MB)
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh release create "${{ steps.v.outputs.tag }}"
+          "${{ steps.pkg.outputs.name }}"
+          --title "${{ steps.v.outputs.tag }}"
+          --generate-notes
