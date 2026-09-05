@@ -114,15 +114,37 @@ public class BlocklistManagerTests : IDisposable
         Assert.Null(manager.TryBlock("about:blank"));
     }
 
-    [Fact]
-    public void TryBlock_EntryWithThreeOrMoreLabels_NeverMatches_KnownLimitation()
+    [Theory]
+    [InlineData("https://ads.example.com/pixel.gif")]  // the entry itself
+    [InlineData("https://eu.ads.example.com/")]        // a subdomain of it
+    [InlineData("https://a.b.c.ads.example.com/")]     // several levels below it
+    public void TryBlock_EntryWithThreeLabels_BlocksThatHostAndEverythingUnderIt(string url)
     {
-        // TryBlock reduces every request URL to its registrable domain before the lookup, but
-        // entries are stored verbatim, so "ads.example.com" can never be found. 127,692 of the
-        // 235,901 entries in ads.txt are in this shape. Delete this test when TryBlock is fixed
-        // to walk suffixes -- it asserts the bug, not the intent.
+        // 127,692 of the 235,901 entries in ads.txt have three or more labels. Before suffix
+        // walking, every one of them was unreachable.
         var manager = Load("ads.txt", "0.0.0.0 ads.example.com");
 
-        Assert.Null(manager.TryBlock("https://ads.example.com/"));
+        Assert.NotNull(manager.TryBlock(url));
+    }
+
+    [Fact]
+    public void TryBlock_EntryWithThreeLabels_DoesNotBlockItsParentDomain()
+    {
+        // Blocking ads.example.com must not take out example.com itself.
+        var manager = Load("ads.txt", "0.0.0.0 ads.example.com");
+
+        Assert.Null(manager.TryBlock("https://example.com/"));
+    }
+
+    [Theory]
+    [InlineData("https://notexample.com/")]
+    [InlineData("https://myexample.com/")]
+    public void TryBlock_HostMerelyEndingWithAnEntry_IsNotBlocked(string url)
+    {
+        // Guards against implementing the suffix walk with EndsWith: matching must only ever
+        // drop whole labels, so notexample.com survives an example.com entry.
+        var manager = Load("ads.txt", "0.0.0.0 example.com");
+
+        Assert.Null(manager.TryBlock(url));
     }
 }

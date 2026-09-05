@@ -39,8 +39,32 @@ public class BlocklistManager
 
     public BlockResponse TryBlock(string url)
     {
-        var uri = new Uri(url);
-        var domain = WebHelpers.GetDomain(uri);
-        return _blocklist.Contains(domain) ? new BlockResponse(404, "Not found") : null;
+        var host = new Uri(url).Host;
+        return IsBlocked(host) ? new BlockResponse(404, "Not found") : null;
+    }
+
+    /// <summary>
+    /// Walks the host's suffixes so that an entry blocks that host and everything beneath it:
+    /// "eu.ads.example.com" is checked, then "ads.example.com", then "example.com", then "com".
+    /// </summary>
+    private bool IsBlocked(string host)
+    {
+        for (var candidate = host; candidate.Length > 0;)
+        {
+            if (_blocklist.Contains(candidate))
+            {
+                return true;
+            }
+
+            var dot = candidate.IndexOf('.');
+            if (dot < 0)
+            {
+                break;
+            }
+
+            candidate = candidate[(dot + 1)..];
+        }
+
+        return false;
     }
 }
