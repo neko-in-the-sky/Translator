@@ -57,6 +57,27 @@ public class BlocklistManagerTests : IDisposable
         Assert.NotNull(manager.TryBlock("https://example.com/"));
     }
 
+    [Theory]
+    [InlineData("0.0.0.0 EXAMPLE.COM")]
+    [InlineData("0.0.0.0 Example.Com")]
+    [InlineData("Example.Com")]
+    public void TryBlock_EntryWithMixedCase_StillBlocks(string line)
+    {
+        // Uri lowercases the host, so a hand-typed capital in my.txt would otherwise
+        // never match anything.
+        var manager = Load("list.txt", line);
+
+        Assert.NotNull(manager.TryBlock("https://example.com/"));
+    }
+
+    [Fact]
+    public void TryBlock_MixedCaseUrl_IsBlocked()
+    {
+        var manager = Load("ads.txt", "0.0.0.0 example.com");
+
+        Assert.NotNull(manager.TryBlock("https://EXAMPLE.CoM/Path"));
+    }
+
     [Fact]
     public void TryBlock_CommentedDomain_IsNotBlocked()
     {

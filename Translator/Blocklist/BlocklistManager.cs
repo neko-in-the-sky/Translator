@@ -8,7 +8,10 @@ public class BlocklistManager
 {
     private const string DefaultDirectory = "Blocklist";
 
-    private readonly HashSet<string> _blocklist = new();
+    // Ordinal, not culture-aware: host names are identifiers, and the app sets
+    // CurrentCulture from configuration, so a culture-sensitive comparison could change
+    // what gets blocked depending on the configured language.
+    private readonly HashSet<string> _blocklist = new(StringComparer.OrdinalIgnoreCase);
 
     public BlocklistManager() : this(DefaultDirectory)
     {
