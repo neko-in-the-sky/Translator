@@ -1,5 +1,8 @@
 # Translator
 
+[![Build](https://github.com/neko-in-the-sky/Translator/actions/workflows/build.yml/badge.svg)](https://github.com/neko-in-the-sky/Translator/actions/workflows/build.yml)
+[![Release](https://github.com/neko-in-the-sky/Translator/actions/workflows/release.yml/badge.svg)](https://github.com/neko-in-the-sky/Translator/actions/workflows/release.yml)
+
 A tray-resident pop-up dictionary for Windows. Copy a word, press <kbd>Ctrl</kbd>+<kbd>Space</kbd>,
 and a small always-on-top window appears next to the cursor with that word already looked up.
 Press <kbd>Esc</kbd> or click away and it disappears.
