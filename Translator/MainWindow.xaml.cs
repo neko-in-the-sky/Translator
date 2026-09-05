@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -192,8 +191,7 @@ public partial class MainWindow : Window
 
     private void MenuItemOpenFolder_Click(object sender, RoutedEventArgs e)
     {
-        string exePath = Assembly.GetExecutingAssembly().Location;
-        string directoryPath = Path.GetDirectoryName(exePath);
+        string directoryPath = AppContext.BaseDirectory;
         if (!string.IsNullOrEmpty(directoryPath))
         {
             Process.Start("explorer.exe", directoryPath);
