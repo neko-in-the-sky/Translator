@@ -183,6 +183,9 @@ public class NavigationButtonViewModel
     public string ToolTip => _searchEngine.Name;
 
     public bool CanAutoSearch(string query) => _autoSearchRegex != null && _autoSearchRegex.IsMatch(query);
+
+    private string BuildUrl() =>
+        string.Format(_searchEngine.UrlTemplate, Uri.EscapeDataString(_query() ?? string.Empty));
     
     private class NavigateCommand(NavigationButtonViewModel parent) : ICommand
     {
@@ -192,7 +195,7 @@ public class NavigationButtonViewModel
         {
             parent._action?.Invoke(new NavigationRequestedEventArgs
             {
-                Url = string.Format(parent._searchEngine.UrlTemplate, parent._query()),
+                Url = parent.BuildUrl(),
                 IsFromHotkey = parameter is true
             });
             
