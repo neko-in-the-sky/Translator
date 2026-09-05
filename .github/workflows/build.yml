@@ -27,3 +27,6 @@ jobs:
 
       - name: Build ${{ matrix.configuration }}
         run: dotnet build Translator.sln -c ${{ matrix.configuration }} --no-restore
+
+      - name: Test ${{ matrix.configuration }}
+        run: dotnet test Translator.sln -c ${{ matrix.configuration }} --no-build
