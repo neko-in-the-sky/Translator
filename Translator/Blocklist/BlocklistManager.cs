@@ -6,11 +6,21 @@ namespace Translator.Blocklist;
 
 public class BlocklistManager
 {
+    private const string DefaultDirectory = "Blocklist";
+
     private readonly HashSet<string> _blocklist = new();
 
-    public BlocklistManager()
+    public BlocklistManager() : this(DefaultDirectory)
     {
-        foreach (var file in Directory.EnumerateFiles("Blocklist", "*.txt"))
+    }
+
+    /// <summary>
+    /// Loads every *.txt file in <paramref name="directory"/>. The parameter exists so tests can
+    /// point at a fixture directory; the app always uses the default.
+    /// </summary>
+    public BlocklistManager(string directory)
+    {
+        foreach (var file in Directory.EnumerateFiles(directory, "*.txt"))
         {
             foreach (var line in File.ReadLines(file))
             {
