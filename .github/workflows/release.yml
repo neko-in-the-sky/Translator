@@ -34,6 +34,9 @@ jobs:
           "version=$version" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
           Write-Host "Building $tag (assembly version $version)"
 
+      - name: Test
+        run: dotnet test Translator.sln -c Release
+
       # Do NOT add -p:IncludeNativeLibrariesForSelfExtract=true here. It silently
       # drops Blocklist/ads.txt from the publish output (154k ad domains), which
       # disables ad blocking at runtime with no error. Saves 9 MB, costs a feature.
