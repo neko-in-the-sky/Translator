@@ -74,33 +74,7 @@ public class NotificationStateChecker
                 case QueryUserNotificationState.QunsRunningD3DFullScreen:
                     return false;
                 case QueryUserNotificationState.QunsBusy:
-                    {
-                        var hWnd = GetForegroundWindow();
-                        if (hWnd == 0)
-                        {
-                            _logger.LogInformation("No foreground window found");
-                            return true;
-                        }
-                        res = GetWindowThreadProcessId(hWnd, out var pid);
-                        if (res != 0)
-                        {
-                            var process = Process.GetProcessById((int)pid);
-                            if (_allowedFullScreenApps.Any(a => process.ProcessName.ToLower().Contains(a.ToLower())))
-                            {
-                                _logger.LogInformation(
-                                    "An allowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
-                                return true;
-                            }
-                            else
-                            {
-                                _logger.LogInformation(
-                                   "A disallowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
-                                return false;
-                            }
-                        }
-
-                        break;
-                    }
+                    return IsForegroundAppAllowed();
             }
         }
         catch (Exception exception)
@@ -108,6 +82,37 @@ public class NotificationStateChecker
             _logger.LogError(exception, "Failed to check whether notifications are allowed");
         }
 
+        return false;
+    }
+
+    /// <summary>
+    /// Checks whether the fullscreen app in the foreground is on the allow list.
+    /// </summary>
+    private bool IsForegroundAppAllowed()
+    {
+        var hWnd = GetForegroundWindow();
+        if (hWnd == 0)
+        {
+            _logger.LogInformation("No foreground window found");
+            return true;
+        }
+
+        var threadId = GetWindowThreadProcessId(hWnd, out var pid);
+        if (threadId == 0)
+        {
+            return false;
+        }
+
+        var process = Process.GetProcessById((int)pid);
+        if (_allowedFullScreenApps.Any(a => process.ProcessName.ToLower().Contains(a.ToLower())))
+        {
+            _logger.LogInformation(
+                "An allowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
+            return true;
+        }
+
+        _logger.LogInformation(
+            "A disallowed foreground window is running: {ProcessName}, PID: {ProcessId}", process.ProcessName, process.Id);
         return false;
     }
 

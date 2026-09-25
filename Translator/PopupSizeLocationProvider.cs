@@ -51,10 +51,10 @@ public class PopupSizeLocationProvider(
         return screenSize;
     }
 
-    private static Point ScreenPixelsToDip(Point p, Visual visual)
+    private static Point ScreenPixelsToDip(Point pixels, Visual visual)
     {
-        var t = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice;
-        return t.Transform(p);
+        var pixelsToDip = PresentationSource.FromVisual(visual).CompositionTarget.TransformFromDevice;
+        return pixelsToDip.Transform(pixels);
     }
 
     [StructLayout(LayoutKind.Sequential)]
