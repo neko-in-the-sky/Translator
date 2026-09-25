@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -26,32 +25,11 @@ public partial class MainWindow : Window
     {
         _mainWindowViewModel = mainWindowViewModel;
         _popupSizeLocationProvider = popupSizeLocationProvider;
-
-        _mainWindowViewModel.NavigationRequested += (args) =>
-        {
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                if (args.IsFromHotkey)
-                {
-                    (Left, Top) = _popupSizeLocationProvider.GetLeftAndTop(this);
-                }
-
-                ShowWindow();
-                if (!string.IsNullOrEmpty(args.Url))
-                {
-                    NavigateToBlankPage();
-                    NavigateToUrl(args.Url);
-                }
-                else if (!string.IsNullOrEmpty(args.Page))
-                {
-                    NavigateToPage(args.Page);
-                }
-            });
-        };
-
         _blocklistManager = blocklistManager;
         _javaScriptProvider = javaScriptProvider;
         _logger = logger;
+
+        _mainWindowViewModel.NavigationRequested += OnNavigationRequested;
 
         InitializeComponent();
         InitializeWebView2();
@@ -67,6 +45,28 @@ public partial class MainWindow : Window
             Top = 0;
             Left = 0;
         };
+    }
+
+    private void OnNavigationRequested(NavigationRequestedEventArgs args)
+    {
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            if (args.IsFromHotkey)
+            {
+                (Left, Top) = _popupSizeLocationProvider.GetLeftAndTop(this);
+            }
+
+            ShowWindow();
+            if (!string.IsNullOrEmpty(args.Url))
+            {
+                NavigateToBlankPage();
+                NavigateToUrl(args.Url);
+            }
+            else if (!string.IsNullOrEmpty(args.Page))
+            {
+                NavigateToPage(args.Page);
+            }
+        });
     }
 
     private void InitializeWebView2()
@@ -206,7 +206,7 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            _mainWindowViewModel.SearchCommands.First().Command.Execute(null);
+            _mainWindowViewModel.DefaultSearchCommand.Command.Execute(null);
         }
     }
 }

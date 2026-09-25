@@ -57,18 +57,12 @@ public class HotkeyManager
         hwndSource!.AddHook(HwndHook);
 
         var virtualKey = (uint)KeyInterop.VirtualKeyFromKey(Hotkey);
-        if (!RegisterHotKey(windowInteropHelper.Handle, HotkeyId, HotkeyModCtrl, virtualKey))
-        {
-            new ToastContentBuilder()
-                .AddText(Properties.Resources.Notification_FailedToAddHotkey)
-                .Show();
-        }
-        else
-        {
-            new ToastContentBuilder()
-                .AddText(Properties.Resources.Notification_AddedHotkey)
-                .Show();
-        }
+        var message = RegisterHotKey(windowInteropHelper.Handle, HotkeyId, HotkeyModCtrl, virtualKey)
+            ? Properties.Resources.Notification_AddedHotkey
+            : Properties.Resources.Notification_FailedToAddHotkey;
+        new ToastContentBuilder()
+            .AddText(message)
+            .Show();
     }
 
     public void UnregisterHotKey()

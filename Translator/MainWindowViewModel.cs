@@ -24,7 +24,6 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly HotkeyManager _hotkeyManager;
     private readonly NotificationStateChecker _notificationStateChecker;
     private readonly PageBuilder _pageBuilder;
-    private readonly NavigationButtonViewModel _defaultButton;
     private readonly ILogger<MainWindowViewModel> _logger;
     private string _queryText;
 
@@ -36,15 +35,30 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _pageBuilder = pageBuilder;
         _logger = logger;
 
+        var settings = applicationSettings.Value;
+        if (settings.SearchEngines is not { Length: > 0 })
+        {
+            throw new InvalidOperationException(
+                $"{nameof(ApplicationSettings)}:{nameof(ApplicationSettings.SearchEngines)} must list at least one search engine.");
+        }
+
         SearchCommands = new();
-        foreach (var searchEngine in applicationSettings.Value.SearchEngines)
+        foreach (var searchEngine in settings.SearchEngines)
         {
             var command = new NavigationButtonViewModel(RequestNavigation, () => QueryText, searchEngine);
             SearchCommands.Add(command);
-            if (searchEngine.Name == applicationSettings.Value.DefaultSearchEngine)
+            if (searchEngine.Name == settings.DefaultSearchEngine)
             {
-                _defaultButton = command;
+                DefaultSearchCommand = command;
             }
+        }
+
+        if (DefaultSearchCommand == null)
+        {
+            DefaultSearchCommand = SearchCommands[0];
+            _logger.LogWarning(
+                "Default search engine {DefaultSearchEngine} is not in the configured list; using {Fallback} instead",
+                settings.DefaultSearchEngine, DefaultSearchCommand.ToolTip);
         }
     }
 
@@ -78,9 +92,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
         QueryText = text;
 
-        if (_defaultButton.CanAutoSearch(text))
+        if (DefaultSearchCommand.CanAutoSearch(text))
         {
-            _defaultButton.Command.Execute(true);
+            DefaultSearchCommand.Command.Execute(true);
         }
         else
         {
@@ -124,6 +138,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     public event PropertyChangedEventHandler PropertyChanged;
 
     public ObservableCollection<NavigationButtonViewModel> SearchCommands { get; }
+
+    public NavigationButtonViewModel DefaultSearchCommand { get; }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
