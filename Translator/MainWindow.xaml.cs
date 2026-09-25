@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Extensions.Logging;
@@ -207,7 +206,7 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            _mainWindowViewModel.SearchCommands.First().Command.Execute(null);
+            _mainWindowViewModel.DefaultSearchCommand.Command.Execute(null);
         }
     }
 }
