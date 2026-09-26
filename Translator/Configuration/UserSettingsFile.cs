@@ -35,11 +35,12 @@ public static class UserSettingsFile
         var userKeys = userConfiguration.GetChildren()
             .Select(section => section.Key)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var properties = typeof(UserSettings).GetProperties();
 
         // Bind appends to an existing array instead of replacing it, so empty every list the user
         // sets first. The key set comes from GetChildren rather than GetSection().Exists(), because
         // the JSON provider stores [] as a null value, which Exists() reports as absent.
-        foreach (var property in typeof(UserSettings).GetProperties())
+        foreach (var property in properties)
         {
             if (property.PropertyType.IsArray && userKeys.Contains(property.Name))
             {
@@ -48,5 +49,17 @@ public static class UserSettingsFile
         }
 
         userConfiguration.Bind(userSettings);
+
+        // A warning, not an error: a setting removed from UserSettings in a later release must not
+        // stop the app starting after the very update this file exists to survive.
+        var ignored = userKeys
+            .Where(key => !properties.Any(p => string.Equals(p.Name, key, StringComparison.OrdinalIgnoreCase)))
+            .ToArray();
+        if (ignored.Length > 0)
+        {
+            logger.LogWarning(
+                "Ignored {Keys} in the user settings file: only {Allowed} can be overridden there",
+                ignored, properties.Select(p => p.Name));
+        }
     }
 }

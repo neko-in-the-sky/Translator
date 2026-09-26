@@ -66,7 +66,7 @@ parallel.
 ### Phase 2: Overlay
 - [x] T2: User file overrides values and nested objects, end-to-end
 - [x] T3: Lists in the user file replace the shipped list
-- [ ] T4: Keys outside `UserSettings` are ignored with a warning
+- [x] T4: Keys outside `UserSettings` are ignored with a warning
 
 ### Checkpoint B
 - [ ] Spec tests 1–8, 12, 13 and 14 pass. A hand-made user file changes culture, pop-up size and

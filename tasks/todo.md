@@ -118,7 +118,7 @@ Test:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** S
 
-- [ ] **T4: Keys outside `UserSettings` are ignored with a warning**
+- [x] **T4: Keys outside `UserSettings` are ignored with a warning**
 
   **Description:** After overlaying, `Apply` logs a single warning listing every top-level key in
   the user file that doesn't match a `UserSettings` property (case-insensitive, like the binder).
@@ -131,9 +131,9 @@ Test:  dotnet test Translator.sln -c Debug
   - A file with only valid keys logs no warning.
 
   **Verification:**
-  - [ ] Tests pass (#8, plus the "no warning" case)
-  - [ ] Build succeeds in Debug
-  - [ ] Manual: add `"SearchEngines": []` to the user file. All seven engines still show, and
+  - [x] Tests pass (#8, plus the "no warning" case)
+  - [x] Build succeeds in Debug
+  - [x] Manual: add `"SearchEngines": []` to the user file. All seven engines still show, and
         `log.txt` has the warning.
 
   **Dependencies:** T3
