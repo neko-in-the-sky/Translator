@@ -2,12 +2,52 @@
 // would collide with System.IO.Path, so it has to be imported explicitly here.
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Abstractions;
 using Translator.Configuration;
 
 namespace Translator.Tests;
 
-public class UserSettingsFileTests
+/// <summary>
+/// xUnit creates one instance per test, so each test gets its own directory for the user file.
+/// </summary>
+public class UserSettingsFileTests : IDisposable
 {
+    private readonly string _directory;
+    private readonly string _path;
+
+    public UserSettingsFileTests()
+    {
+        _directory = Path.Combine(Path.GetTempPath(), "translator-usersettings-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(_directory);
+        _path = Path.Combine(_directory, "usersettings.json");
+    }
+
+    public void Dispose() => Directory.Delete(_directory, recursive: true);
+
+    /// <summary>
+    /// Mirrors the UserSettings section of the shipped appsettings.json.
+    /// </summary>
+    private static UserSettings Shipped() => new()
+    {
+        DefaultSearchEngine = "Oxford",
+        Culture = "en-US",
+        AllowedFullscreenApps = ["firefox", "foxit", "explorer", "translator"],
+        Popup = new PopupSettings { DefaultWidth = 650, DefaultHeight = 500, VerticalOffsetFromCursor = 25 }
+    };
+
+    private UserSettings ApplyUserFile(string json)
+    {
+        File.WriteAllText(_path, json);
+        return ApplyTo(_path);
+    }
+
+    private static UserSettings ApplyTo(string path)
+    {
+        var settings = Shipped();
+        UserSettingsFile.Apply(UserSettingsFile.Load(path), settings, NullLogger.Instance);
+        return settings;
+    }
+
     [Fact]
     public void ShippedAppSettings_BindsEveryUserSetting()
     {
@@ -26,5 +66,75 @@ public class UserSettingsFileTests
         Assert.NotEmpty(settings.UserSettings.AllowedFullscreenApps);
         Assert.NotNull(settings.UserSettings.Popup);
         Assert.True(settings.UserSettings.Popup.DefaultWidth > 0);
+    }
+
+    [Fact]
+    public void DefaultPath_IsUserSettingsJsonInTheTranslatorAppDataFolder()
+    {
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+        Assert.Equal(Path.Combine(appData, "Translator", "usersettings.json"), UserSettingsFile.DefaultPath);
+    }
+
+    [Fact]
+    public void Apply_NoUserFile_KeepsShippedSettings()
+    {
+        var settings = ApplyTo(_path);
+
+        Assert.Equivalent(Shipped(), settings, strict: true);
+    }
+
+    [Fact]
+    public void Apply_NoUserFolder_KeepsShippedSettings()
+    {
+        // On first run %APPDATA%\Translator may not exist at all, not just the file.
+        var settings = ApplyTo(Path.Combine(_directory, "missing", "usersettings.json"));
+
+        Assert.Equivalent(Shipped(), settings, strict: true);
+    }
+
+    [Fact]
+    public void Apply_UserValues_OverrideShippedValues()
+    {
+        var settings = ApplyUserFile("""{ "Culture": "ru-RU", "DefaultSearchEngine": "Multitran" }""");
+
+        Assert.Equal("ru-RU", settings.Culture);
+        Assert.Equal("Multitran", settings.DefaultSearchEngine);
+    }
+
+    [Fact]
+    public void Apply_PartialPopup_OverridesOnlyThatField()
+    {
+        var settings = ApplyUserFile("""{ "Popup": { "DefaultWidth": 800 } }""");
+
+        Assert.Equal(800, settings.Popup.DefaultWidth);
+        Assert.Equal(500, settings.Popup.DefaultHeight);
+        Assert.Equal(25, settings.Popup.VerticalOffsetFromCursor);
+    }
+
+    [Fact]
+    public void Load_MalformedJson_ThrowsNamingTheFile()
+    {
+        // App shows this message in its startup error dialog, so it must point the user at the file.
+        File.WriteAllText(_path, """{ "Culture": "ru-RU" """);
+
+        var exception = Record.Exception(() => UserSettingsFile.Load(_path));
+
+        Assert.NotNull(exception);
+        Assert.Contains(_path, exception.Message);
+    }
+
+    [Fact]
+    public void Load_CommentsAndTrailingCommas_AreAccepted()
+    {
+        var settings = ApplyUserFile("""
+            // My settings
+            {
+              /* Russian UI */
+              "Culture": "ru-RU",
+            }
+            """);
+
+        Assert.Equal("ru-RU", settings.Culture);
     }
 }

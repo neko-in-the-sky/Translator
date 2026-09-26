@@ -64,7 +64,7 @@ parallel.
 - [x] `dotnet test` green in Debug and Release. The app starts and behaves exactly as before.
 
 ### Phase 2: Overlay
-- [ ] T2: User file overrides values and nested objects, end-to-end
+- [x] T2: User file overrides values and nested objects, end-to-end
 - [ ] T3: Lists in the user file replace the shipped list
 - [ ] T4: Keys outside `UserSettings` are ignored with a warning
 

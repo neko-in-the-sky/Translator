@@ -47,6 +47,13 @@ namespace Translator
                 builder.Services.Configure<ApplicationSettings>(
                     builder.Configuration.GetSection(key: nameof(ApplicationSettings)));
 
+                // Loaded here rather than lazily so that malformed JSON reaches the catch below and
+                // the user sees which file is broken.
+                var userConfiguration = UserSettingsFile.Load(UserSettingsFile.DefaultPath);
+                builder.Services.AddOptions<ApplicationSettings>()
+                    .PostConfigure<ILoggerFactory>((settings, loggerFactory) => UserSettingsFile.Apply(
+                        userConfiguration, settings.UserSettings, loggerFactory.CreateLogger(typeof(UserSettingsFile))));
+
                 _host = builder.Build();
                 
                 Application.Current.DispatcherUnhandledException += (_, args) =>

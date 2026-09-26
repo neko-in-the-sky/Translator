@@ -57,7 +57,7 @@ Test:  dotnet test Translator.sln -c Debug
 
 ## Phase 2: Overlay
 
-- [ ] **T2: User file overrides values and nested objects, end-to-end**
+- [x] **T2: User file overrides values and nested objects, end-to-end**
 
   **Description:** Add `UserSettingsFile` with `DefaultPath` and `Apply(userConfig, userSettings,
   logger)`. For now, `Apply` binds scalars and nested objects only. Wire it into `App`: build the
@@ -73,11 +73,15 @@ Test:  dotnet test Translator.sln -c Debug
     load (#13).
 
   **Verification:**
-  - [ ] Tests pass (#1, #2, #3, #12, #13)
-  - [ ] Build succeeds in Debug
-  - [ ] Manual: hand-create `%APPDATA%\Translator\usersettings.json` with `{"Culture":"ru-RU"}`
+  - [x] Tests pass (#1, #2, #3, #12, #13)
+  - [x] Build succeeds in Debug
+  - [x] Manual: hand-create `%APPDATA%\Translator\usersettings.json` with `{"Culture":"ru-RU"}`
         and confirm the tray menu is in Russian. Break the JSON and confirm the startup dialog names
         the file. Delete the file afterwards.
+        *Done with `{"DefaultSearchEngine":"Oxfrod"}` instead: the running app logged its
+        "not in the configured list" warning. The Russian tray menu is still to be checked by eye
+        at Checkpoint B. The malformed-file dialog was read via UI Automation, and its first line
+        names the file.*
 
   **Dependencies:** T1
 
