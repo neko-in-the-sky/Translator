@@ -72,12 +72,6 @@ Put in only what you want to change. Anything you leave out uses the default fro
   when Translator starts. For JSON errors, the message names the file. Comments and trailing
   commas are fine.
 
-### Upgrading from an older release
-
-Releases before this change kept these settings in `appsettings.json` in the install folder, and
-each update overwrote that file. The update to this version overwrites it one last time. If you
-had changed it, copy your changes into `usersettings.json` in the new flat format shown above.
-
 ## Credits
 
 - Icon: [Stack of books](https://www.flaticon.com/free-icon/stack-of-books_5832416) from Flaticon

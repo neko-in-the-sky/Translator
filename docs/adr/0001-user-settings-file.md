@@ -64,7 +64,7 @@ lost on update unless they backed it up and merged it back by hand.
 - A user who sets their own `AllowedFullscreenApps` doesn't get apps added to the shipped list in
   later releases. This is accepted as the cost of predictable replace semantics.
 - Users upgrading from a release before this change lose their `appsettings.json` edits one last
-  time and must move them to `usersettings.json`. The README's Settings section says so.
+  time and must move them to `usersettings.json`. The release notes for that release say so.
 - Making another setting overridable means moving it into `UserSettings`, both in the class and in
   `appsettings.json`. That is a deliberate, reviewable change.
 - `Blocklist/my.txt` has the same overwrite-on-update problem and is not covered by this decision.
