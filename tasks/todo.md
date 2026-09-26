@@ -145,8 +145,8 @@ Test:  dotnet test Translator.sln -c Debug
   **Estimated scope:** XS
 
 ### Checkpoint B
-- [ ] Spec tests #1–#8, #12–#14 pass in Debug and Release
-- [ ] Manual checks from T2–T4 done, and the user file deleted afterwards
+- [x] Spec tests #1–#8, #12–#14 pass in Debug and Release
+- [x] Manual checks from T2–T4 done, and the user file deleted afterwards
 - [ ] **Review with the user before Phase 3**
 
 ---
