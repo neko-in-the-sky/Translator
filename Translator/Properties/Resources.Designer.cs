@@ -133,6 +133,15 @@ namespace Translator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open settings folder.
+        /// </summary>
+        public static string TrayIcon_MenuItem_OpenSettingsFolder {
+            get {
+                return ResourceManager.GetString("TrayIcon_MenuItem_OpenSettingsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Translate (Ctrl + Space).
         /// </summary>
         public static string TrayIcon_MenuItem_Translate {

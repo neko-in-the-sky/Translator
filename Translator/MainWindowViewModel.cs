@@ -47,7 +47,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         {
             var command = new NavigationButtonViewModel(RequestNavigation, () => QueryText, searchEngine);
             SearchCommands.Add(command);
-            if (searchEngine.Name == settings.DefaultSearchEngine)
+            if (searchEngine.Name == settings.UserSettings.DefaultSearchEngine)
             {
                 DefaultSearchCommand = command;
             }
@@ -58,7 +58,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             DefaultSearchCommand = SearchCommands[0];
             _logger.LogWarning(
                 "Default search engine {DefaultSearchEngine} is not in the configured list; using {Fallback} instead",
-                settings.DefaultSearchEngine, DefaultSearchCommand.ToolTip);
+                settings.UserSettings.DefaultSearchEngine, DefaultSearchCommand.ToolTip);
         }
     }
 

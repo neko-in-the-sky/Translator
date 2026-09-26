@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Translator.Blocklist;
+using Translator.Configuration;
 
 namespace Translator;
 
@@ -199,6 +200,21 @@ public partial class MainWindow : Window
         else
         {
             _logger.LogWarning("Unable to locate the directory of the current application.");
+        }
+    }
+
+    private void MenuItemOpenSettingsFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var directoryPath = Path.GetDirectoryName(UserSettingsFile.DefaultPath)!;
+        try
+        {
+            // The folder is normally created at startup, but the user may have deleted it since.
+            Directory.CreateDirectory(directoryPath);
+            Process.Start("explorer.exe", directoryPath);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogWarning(exception, "Unable to open the settings folder {Path}", directoryPath);
         }
     }
 

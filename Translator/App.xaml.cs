@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
+using Serilog.Extensions.Logging;
 using Translator.Blocklist;
 using Translator.Configuration;
 
@@ -47,6 +48,17 @@ namespace Translator
                 builder.Services.Configure<ApplicationSettings>(
                     builder.Configuration.GetSection(key: nameof(ApplicationSettings)));
 
+                // DI is not built yet, so the starter file logs through the Serilog logger directly.
+                UserSettingsFile.EnsureCreated(UserSettingsFile.DefaultPath,
+                    new SerilogLoggerFactory(Log.Logger).CreateLogger(typeof(UserSettingsFile)));
+
+                // Loaded here rather than lazily so that malformed JSON reaches the catch below and
+                // the user sees which file is broken.
+                var userConfiguration = UserSettingsFile.Load(UserSettingsFile.DefaultPath);
+                builder.Services.AddOptions<ApplicationSettings>()
+                    .PostConfigure<ILoggerFactory>((settings, loggerFactory) => UserSettingsFile.Apply(
+                        userConfiguration, settings.UserSettings, loggerFactory.CreateLogger(typeof(UserSettingsFile))));
+
                 _host = builder.Build();
                 
                 Application.Current.DispatcherUnhandledException += (_, args) =>
@@ -55,7 +67,7 @@ namespace Translator
                 };
 
                 CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(
-                    _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.Culture);
+                    _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.UserSettings.Culture);
             }
             catch (Exception exception)
             {

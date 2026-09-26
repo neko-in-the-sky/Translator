@@ -22,7 +22,7 @@ public class NotificationStateChecker
     public NotificationStateChecker(IOptions<ApplicationSettings> applicationSettings,
         ILogger<NotificationStateChecker> logger)
     {
-        _allowedFullScreenApps = new(applicationSettings.Value.AllowedFullscreenApps);
+        _allowedFullScreenApps = new(applicationSettings.Value.UserSettings.AllowedFullscreenApps);
         _logger = logger;
         
         _logger.LogInformation("Allowed fullscreen apps: {@apps}", _allowedFullScreenApps);
