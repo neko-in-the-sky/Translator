@@ -58,10 +58,10 @@ parallel.
 ## Task List
 
 ### Phase 1: Restructure
-- [ ] T1: Move the four settings into `ApplicationSettings.UserSettings` (no behaviour change)
+- [x] T1: Move the four settings into `ApplicationSettings.UserSettings` (no behaviour change)
 
 ### Checkpoint A
-- [ ] `dotnet test` green in Debug and Release. The app starts and behaves exactly as before.
+- [x] `dotnet test` green in Debug and Release. The app starts and behaves exactly as before.
 
 ### Phase 2: Overlay
 - [ ] T2: User file overrides values and nested objects, end-to-end

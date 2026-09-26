@@ -14,7 +14,7 @@ Test:  dotnet test Translator.sln -c Debug
 
 ## Phase 1: Restructure
 
-- [ ] **T1: Move the four settings into `ApplicationSettings.UserSettings` (no behaviour change)**
+- [x] **T1: Move the four settings into `ApplicationSettings.UserSettings` (no behaviour change)**
 
   **Description:** Add the `UserSettings` options class and move `DefaultSearchEngine`, `Culture`,
   `AllowedFullscreenApps` and `Popup` into it, both in C# and in the shipped `appsettings.json`.
@@ -31,9 +31,9 @@ Test:  dotnet test Translator.sln -c Debug
     property non-null and `SearchEngines` non-empty.
 
   **Verification:**
-  - [ ] Build succeeds in Debug (warnings are errors)
-  - [ ] Tests pass, including the updated `MainWindowViewModelTests` and new #14
-  - [ ] Manual: the app starts, the default engine is Oxford, and the pop-up size is unchanged
+  - [x] Build succeeds in Debug (warnings are errors)
+  - [x] Tests pass, including the updated `MainWindowViewModelTests` and new #14
+  - [x] Manual: the app starts, the default engine is Oxford, and the pop-up size is unchanged
 
   **Dependencies:** None
 
@@ -51,7 +51,7 @@ Test:  dotnet test Translator.sln -c Debug
   **Estimated scope:** M (9 files, all mechanical)
 
 ### Checkpoint A
-- [ ] Tests green in Debug and Release. The app behaves exactly as before.
+- [x] Tests green in Debug and Release. The app behaves exactly as before.
 
 ---
 

@@ -10,8 +10,11 @@ public class MainWindowViewModelTests
     {
         var settings = Options.Create(new ApplicationSettings
         {
-            DefaultSearchEngine = defaultSearchEngine,
-            AllowedFullscreenApps = [],
+            UserSettings = new UserSettings
+            {
+                DefaultSearchEngine = defaultSearchEngine,
+                AllowedFullscreenApps = []
+            },
             SearchEngines = engineNames
                 .Select(name => new SearchEngine
                 {

@@ -55,7 +55,7 @@ namespace Translator
                 };
 
                 CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(
-                    _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.Culture);
+                    _host.Services.GetRequiredService<IOptions<ApplicationSettings>>().Value.UserSettings.Culture);
             }
             catch (Exception exception)
             {

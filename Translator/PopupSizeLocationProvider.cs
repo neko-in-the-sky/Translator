@@ -15,7 +15,7 @@ public class PopupSizeLocationProvider(
     ILogger<PopupSizeLocationProvider> logger,
     IOptions<ApplicationSettings> applicationSettings)
 {
-    private readonly PopupSettings _popupSettings = applicationSettings.Value.Popup;
+    private readonly PopupSettings _popupSettings = applicationSettings.Value.UserSettings.Popup;
 
     [DllImport("user32.dll")]
     private static extern bool GetCursorPos(out PointUser32 lpPoint);
