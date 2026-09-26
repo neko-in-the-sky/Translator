@@ -148,4 +148,7 @@
   <data name="TrayIcon_MenuItem_OpenFolder" xml:space="preserve">
     <value>Открыть папку</value>
   </data>
+  <data name="TrayIcon_MenuItem_OpenSettingsFolder" xml:space="preserve">
+    <value>Открыть папку настроек</value>
+  </data>
 </root>

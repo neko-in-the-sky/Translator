@@ -45,6 +45,7 @@
                         <MenuItem Click="MenuItemTranslate_Click" Header="{x:Static p:Resources.TrayIcon_MenuItem_Translate}" />
                         <Separator />
                         <MenuItem Click="MenuItemOpenFolder_Click" Header="{x:Static p:Resources.TrayIcon_MenuItem_OpenFolder}" />
+                        <MenuItem Click="MenuItemOpenSettingsFolder_Click" Header="{x:Static p:Resources.TrayIcon_MenuItem_OpenSettingsFolder}" />
                         <MenuItem Click="MenuItemExit_Click" Header="{x:Static p:Resources.TrayIcon_MenuItem_Exit}" />
                     </ContextMenu>
                 </tb:TaskbarIcon.ContextMenu>

@@ -181,7 +181,7 @@ Test:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** S
 
-- [ ] **T6: "Open settings folder" tray item**
+- [x] **T6: "Open settings folder" tray item**
 
   **Description:** Add a tray menu item below *Open folder* that opens the folder containing
   `UserSettingsFile.DefaultPath` in Explorer. It creates the folder first if it is missing, and
@@ -194,9 +194,9 @@ Test:  dotnet test Translator.sln -c Debug
   - Clicking it opens `%APPDATA%\Translator` in Explorer.
 
   **Verification:**
-  - [ ] Build succeeds in Debug **from the command line** (proves the Designer.cs edit)
-  - [ ] Tests pass
-  - [ ] Manual: click the item in both cultures
+  - [x] Build succeeds in Debug **from the command line** (proves the Designer.cs edit)
+  - [x] Tests pass
+  - [ ] Manual: click the item in both cultures *(left for the user: the tray menu can't be driven from here. Localised text is covered by ResourcesTests.)*
 
   **Dependencies:** T2 (for `DefaultPath`)
 

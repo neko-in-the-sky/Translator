@@ -75,7 +75,7 @@ parallel.
 
 ### Phase 3: Discoverability
 - [x] T5: Create the starter file on first run
-- [ ] T6: "Open settings folder" tray item
+- [x] T6: "Open settings folder" tray item
 - [ ] T7: README section and migration note
 
 ### Checkpoint C (done)
