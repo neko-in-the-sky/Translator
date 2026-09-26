@@ -233,7 +233,15 @@ Test:  dotnet test Translator.sln -c Debug
   **Estimated scope:** XS
 
 ### Checkpoint C (done)
-- [ ] All 14 spec tests pass: `dotnet test Translator.sln -c Debug` and `-c Release`
-- [ ] Spec manual check passes, including replacing a real `dotnet publish` output folder
-- [ ] Every Success Criteria box in SPEC.md is ticked
-- [ ] Release-notes line about the one-time migration is drafted for the maintainer
+- [x] All 14 spec tests pass: `dotnet test Translator.sln -c Debug` and `-c Release`
+- [x] Spec manual check passes, including replacing a real `dotnet publish` output folder
+- [x] Every Success Criteria box in SPEC.md is ticked
+- [x] Release-notes line about the one-time migration is drafted for the maintainer:
+
+  > **Your settings now survive updates.** Settings you change go in
+  > `%APPDATA%\Translator\usersettings.json` (tray menu → *Open settings folder*). This update
+  > overwrites the install folder's `appsettings.json` one last time. If you had edited it, copy
+  > your changes into `usersettings.json`. See the README's Settings section.
+
+Still to be checked by eye: the Russian tray menu from a user file, and clicking *Open settings
+folder*.

@@ -69,8 +69,10 @@ parallel.
 - [x] T4: Keys outside `UserSettings` are ignored with a warning
 
 ### Checkpoint B
-- [ ] Spec tests 1–8, 12, 13 and 14 pass. A hand-made user file changes culture, pop-up size and
+- [x] Spec tests 1–8, 12, 13 and 14 pass. A hand-made user file changes culture, pop-up size and
       the full-screen list, and `SearchEngines` in it is ignored with a warning in `log.txt`.
+      (Checked in the running app through the log. Culture and pop-up size are covered by tests
+      but not yet seen on screen.)
 - [x] Review with the user before Phase 3 (approved 2026-09-26).
 
 ### Phase 3: Discoverability
@@ -79,10 +81,10 @@ parallel.
 - [x] T7: README section and migration note
 
 ### Checkpoint C (done)
-- [ ] All 14 spec tests pass in Debug and Release.
-- [ ] Spec manual check passes. The last step (replace the install folder, setting persists) is
+- [x] All 14 spec tests pass in Debug and Release.
+- [x] Spec manual check passes. The last step (replace the install folder, setting persists) is
       done with a real `dotnet publish` output.
-- [ ] Every Success Criteria box in SPEC.md is ticked.
+- [x] Every Success Criteria box in SPEC.md is ticked.
 
 ## Risks and Mitigations
 

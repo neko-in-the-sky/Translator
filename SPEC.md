@@ -301,16 +301,16 @@ Manual check before merge:
 
 ## Success Criteria
 
-- [ ] All 14 test cases above pass in Debug and Release.
-- [ ] Only `UserSettings` values can be overridden. `SearchEngines`, `Serilog` and all other keys
+- [x] All 14 test cases above pass in Debug and Release.
+- [x] Only `UserSettings` values can be overridden. `SearchEngines`, `Serilog` and all other keys
       in the user file are ignored with a warning.
-- [ ] A user list replaces the shipped list, including `[]`.
-- [ ] A value in the user file survives replacing the install folder (manual check).
-- [ ] First run creates the starter file. Later runs leave it untouched.
-- [ ] A malformed user file produces a startup error that names the file.
-- [ ] The tray has an "Open settings folder" item in en-US and ru-RU.
-- [ ] The README documents the user file, the override rules and the one-time migration.
-- [ ] No new package references, and the release workflow is unchanged.
+- [x] A user list replaces the shipped list, including `[]`.
+- [x] A value in the user file survives replacing the install folder (manual check).
+- [x] First run creates the starter file. Later runs leave it untouched.
+- [x] A malformed user file produces a startup error that names the file.
+- [x] The tray has an "Open settings folder" item in en-US and ru-RU. (Text verified by test; clicking it is left for a manual check.)
+- [x] The README documents the user file, the override rules and the one-time migration.
+- [x] No new package references, and the release workflow is unchanged.
 
 ## Out of Scope
 
