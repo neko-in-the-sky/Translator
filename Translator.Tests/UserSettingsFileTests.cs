@@ -190,6 +190,56 @@ public class UserSettingsFileTests : IDisposable
     }
 
     [Fact]
+    public void EnsureCreated_NoFile_CreatesFolderAndFile()
+    {
+        var path = Path.Combine(_directory, "Translator", "usersettings.json");
+
+        UserSettingsFile.EnsureCreated(path, NullLogger.Instance);
+
+        Assert.True(File.Exists(path));
+    }
+
+    [Fact]
+    public void EnsureCreated_StarterFile_LoadsWithNoOverridesAndNoWarnings()
+    {
+        UserSettingsFile.EnsureCreated(_path, NullLogger.Instance);
+        var settings = Shipped();
+        var logger = new CapturingLogger();
+
+        UserSettingsFile.Apply(UserSettingsFile.Load(_path), settings, logger);
+
+        Assert.Equivalent(Shipped(), settings, strict: true);
+        Assert.DoesNotContain(logger.Entries, e => e.Level >= LogLevel.Warning);
+    }
+
+    [Fact]
+    public void EnsureCreated_ExistingFile_IsLeftByteForByteUnchanged()
+    {
+        // No BOM, no trailing newline, odd spacing: anything a rewrite would normalise.
+        var original = "{\"Culture\":   \"ru-RU\"}"u8.ToArray();
+        File.WriteAllBytes(_path, original);
+
+        UserSettingsFile.EnsureCreated(_path, NullLogger.Instance);
+
+        Assert.Equal(original, File.ReadAllBytes(_path));
+    }
+
+    [Fact]
+    public void EnsureCreated_UnwritablePath_DoesNotThrow()
+    {
+        // A file where the folder should be makes CreateDirectory fail without relying on ACLs.
+        var blocker = Path.Combine(_directory, "Translator");
+        File.WriteAllText(blocker, "");
+        var logger = new CapturingLogger();
+
+        var exception = Record.Exception(
+            () => UserSettingsFile.EnsureCreated(Path.Combine(blocker, "usersettings.json"), logger));
+
+        Assert.Null(exception);
+        Assert.Single(logger.Entries, e => e.Level == LogLevel.Warning);
+    }
+
+    [Fact]
     public void Load_MalformedJson_ThrowsNamingTheFile()
     {
         // App shows this message in its startup error dialog, so it must point the user at the file.

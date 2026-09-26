@@ -16,6 +16,46 @@ public static class UserSettingsFile
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "Translator", "usersettings.json");
 
+    private const string StarterContent = """
+        // Your personal Translator settings. Updates never change this file.
+        //
+        // Copy any setting from the "UserSettings" section of appsettings.json in the
+        // Translator install folder to here, and change its value. Anything you leave
+        // out uses the default. A list you set here replaces the default list completely.
+        //
+        // Example:
+        //   "Culture": "ru-RU",
+        //   "Popup": { "DefaultWidth": 800 }
+        {
+        }
+        """;
+
+    /// <summary>
+    /// Writes a commented starter file if none exists, so users can find where their settings go.
+    /// Never overwrites, and never throws: a user who cannot write to their profile still gets a
+    /// working app with the shipped defaults.
+    /// </summary>
+    public static void EnsureCreated(string path, ILogger logger)
+    {
+        if (File.Exists(path))
+        {
+            return;
+        }
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            // CreateNew rather than WriteAllText, so a file that appeared since the check is kept.
+            using var writer = new StreamWriter(new FileStream(path, FileMode.CreateNew));
+            writer.Write(StarterContent);
+            logger.LogInformation("Created the user settings file {Path}", path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            logger.LogWarning(exception, "Could not create the user settings file {Path}; using the shipped settings", path);
+        }
+    }
+
     /// <summary>
     /// Reads the file into a configuration of its own. It is deliberately never added to the host's
     /// configuration, so nothing outside <see cref="UserSettings"/> can be overridden. Throws on

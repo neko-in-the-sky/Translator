@@ -147,13 +147,13 @@ Test:  dotnet test Translator.sln -c Debug
 ### Checkpoint B
 - [x] Spec tests #1–#8, #12–#14 pass in Debug and Release
 - [x] Manual checks from T2–T4 done, and the user file deleted afterwards
-- [ ] **Review with the user before Phase 3**
+- [x] **Review with the user before Phase 3** (approved 2026-09-26)
 
 ---
 
 ## Phase 3: Discoverability
 
-- [ ] **T5: Create the starter file on first run**
+- [x] **T5: Create the starter file on first run**
 
   **Description:** Add `UserSettingsFile.EnsureCreated(path, logger)`. It writes the spec's
   starter file if the file is missing, never overwrites an existing file and never throws. It logs
@@ -167,9 +167,9 @@ Test:  dotnet test Translator.sln -c Debug
     *file*, so it doesn't depend on ACLs.
 
   **Verification:**
-  - [ ] Tests pass (#9–#11)
-  - [ ] Build succeeds in Debug
-  - [ ] Manual: delete `%APPDATA%\Translator`, start the app, and confirm the starter file
+  - [x] Tests pass (#9–#11)
+  - [x] Build succeeds in Debug
+  - [x] Manual: delete `%APPDATA%\Translator`, start the app, and confirm the starter file
         appears with the spec's comment text. Edit it, restart, and confirm the edit is kept.
 
   **Dependencies:** T2

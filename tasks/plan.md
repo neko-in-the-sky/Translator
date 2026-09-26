@@ -71,10 +71,10 @@ parallel.
 ### Checkpoint B
 - [ ] Spec tests 1–8, 12, 13 and 14 pass. A hand-made user file changes culture, pop-up size and
       the full-screen list, and `SearchEngines` in it is ignored with a warning in `log.txt`.
-- [ ] Review with the user before Phase 3.
+- [x] Review with the user before Phase 3 (approved 2026-09-26).
 
 ### Phase 3: Discoverability
-- [ ] T5: Create the starter file on first run
+- [x] T5: Create the starter file on first run
 - [ ] T6: "Open settings folder" tray item
 - [ ] T7: README section and migration note
 
