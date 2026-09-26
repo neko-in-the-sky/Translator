@@ -65,7 +65,7 @@ parallel.
 
 ### Phase 2: Overlay
 - [x] T2: User file overrides values and nested objects, end-to-end
-- [ ] T3: Lists in the user file replace the shipped list
+- [x] T3: Lists in the user file replace the shipped list
 - [ ] T4: Keys outside `UserSettings` are ignored with a warning
 
 ### Checkpoint B

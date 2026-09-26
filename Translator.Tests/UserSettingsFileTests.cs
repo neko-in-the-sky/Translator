@@ -113,6 +113,43 @@ public class UserSettingsFileTests : IDisposable
     }
 
     [Fact]
+    public void Apply_ShorterUserList_ReplacesTheShippedList()
+    {
+        // Plain configuration layering merges arrays by index, which would keep "explorer" and
+        // "translator" from the shipped list here.
+        var settings = ApplyUserFile("""{ "AllowedFullscreenApps": ["chrome"] }""");
+
+        Assert.Equal(["chrome"], settings.AllowedFullscreenApps);
+    }
+
+    [Fact]
+    public void Apply_LongerUserList_ReplacesTheShippedList()
+    {
+        // ConfigurationBinder.Bind appends to an existing array rather than replacing it.
+        var settings = ApplyUserFile("""{ "AllowedFullscreenApps": ["a", "b", "c", "d", "e"] }""");
+
+        Assert.Equal(["a", "b", "c", "d", "e"], settings.AllowedFullscreenApps);
+    }
+
+    [Fact]
+    public void Apply_EmptyUserList_ClearsTheShippedList()
+    {
+        // The JSON provider stores [] as a key with a null value and no children, so the section
+        // looks absent to GetSection().Exists(). An empty list must still mean "no apps".
+        var settings = ApplyUserFile("""{ "AllowedFullscreenApps": [] }""");
+
+        Assert.Empty(settings.AllowedFullscreenApps);
+    }
+
+    [Fact]
+    public void Apply_NoUserList_KeepsTheShippedList()
+    {
+        var settings = ApplyUserFile("""{ "Culture": "ru-RU" }""");
+
+        Assert.Equal(["firefox", "foxit", "explorer", "translator"], settings.AllowedFullscreenApps);
+    }
+
+    [Fact]
     public void Load_MalformedJson_ThrowsNamingTheFile()
     {
         // App shows this message in its startup error dialog, so it must point the user at the file.

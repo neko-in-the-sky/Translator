@@ -92,7 +92,7 @@ Test:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** S
 
-- [ ] **T3: Lists in the user file replace the shipped list**
+- [x] **T3: Lists in the user file replace the shipped list**
 
   **Description:** Before binding, `Apply` resets to empty every array-typed property of
   `UserSettings` that the user file mentions. Found by reflection, so future lists are covered.
@@ -105,9 +105,9 @@ Test:  dotnet test Translator.sln -c Debug
   - `[]` gives an empty list (#6). No key keeps the shipped list (#7).
 
   **Verification:**
-  - [ ] Tests pass (#4–#7)
-  - [ ] Build succeeds in Debug
-  - [ ] Manual: `{"AllowedFullscreenApps":["chrome"]}` shows `["chrome"]` in the "Allowed
+  - [x] Tests pass (#4–#7)
+  - [x] Build succeeds in Debug
+  - [x] Manual: `{"AllowedFullscreenApps":["chrome"]}` shows `["chrome"]` in the "Allowed
         fullscreen apps" line in `log.txt`
 
   **Dependencies:** T2

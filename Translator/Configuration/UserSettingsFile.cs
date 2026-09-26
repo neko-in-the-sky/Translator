@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -26,10 +27,26 @@ public static class UserSettingsFile
 
     /// <summary>
     /// Overlays the user's values onto <paramref name="userSettings"/>, which already holds the
-    /// shipped values. Anything the file leaves out keeps its shipped value.
+    /// shipped values. Anything the file leaves out keeps its shipped value, and a list the file
+    /// sets replaces the shipped list completely.
     /// </summary>
     public static void Apply(IConfiguration userConfiguration, UserSettings userSettings, ILogger logger)
     {
+        var userKeys = userConfiguration.GetChildren()
+            .Select(section => section.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Bind appends to an existing array instead of replacing it, so empty every list the user
+        // sets first. The key set comes from GetChildren rather than GetSection().Exists(), because
+        // the JSON provider stores [] as a null value, which Exists() reports as absent.
+        foreach (var property in typeof(UserSettings).GetProperties())
+        {
+            if (property.PropertyType.IsArray && userKeys.Contains(property.Name))
+            {
+                property.SetValue(userSettings, Array.CreateInstance(property.PropertyType.GetElementType()!, 0));
+            }
+        }
+
         userConfiguration.Bind(userSettings);
     }
 }
