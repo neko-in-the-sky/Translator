@@ -209,7 +209,7 @@ Test:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** M (5 files, small edits)
 
-- [ ] **T7: README section and migration note**
+- [x] **T7: README section and migration note**
 
   **Description:** Add a "Customising settings" section to the README. It covers where the file
   lives, the tray item, the flat format with an example, the override rules table (values, `Popup`
@@ -222,8 +222,8 @@ Test:  dotnet test Translator.sln -c Debug
   - The migration note says the upgrade release overwrites `appsettings.json` one last time.
 
   **Verification:**
-  - [ ] Manual: follow the README from a clean `%APPDATA%` and confirm the example works
-  - [ ] The README's Usage table and "How it works" still match the app
+  - [x] Manual: follow the README from a clean `%APPDATA%` and confirm the example works
+  - [x] The README's Usage table and "How it works" still match the app
 
   **Dependencies:** T3, T4, T5, T6
 

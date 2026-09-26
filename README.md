@@ -19,10 +19,10 @@ Download the latest `Translator-<version>-win-x64.zip` from
 | Action | Result |
 |---|---|
 | <kbd>Ctrl</kbd>+<kbd>Space</kbd> | Look up the clipboard text at the cursor |
-| <kbd>Enter</kbd> in the search box | Search with the first engine in the list |
+| <kbd>Enter</kbd> in the search box | Search with the default engine (see [Settings](#settings)) |
 | <kbd>Esc</kbd>, or clicking away | Hide the window |
 | Toolbar icons | Re-run the current query against that engine |
-| Tray icon | Translate, open the install folder, or exit |
+| Tray icon | Translate, open the install folder, open the settings folder, or exit |
 
 ## How it works
 
@@ -37,6 +37,46 @@ Download the latest `Translator-<version>-win-x64.zip` from
 If the copied text does not match the default engine's `AutoSearchRegex`, nothing is searched
 automatically — a confirmation page appears instead, so a stray clipboard full of text never
 turns into a web request on its own.
+
+## Settings
+
+Your settings live in `%APPDATA%\Translator\usersettings.json`. Updates never touch this file, so
+whatever you set there survives every new release. Translator creates it on first run with a short
+explanation inside. Right-click the tray icon and choose **Open settings folder** to find it.
+
+Put in only what you want to change. Anything you leave out uses the default from the
+`UserSettings` section of `appsettings.json` in the install folder:
+
+```jsonc
+{
+  "DefaultSearchEngine": "Multitran",
+  "Culture": "ru-RU",
+  "AllowedFullscreenApps": ["firefox", "vlc"],
+  "Popup": { "DefaultWidth": 800 }
+}
+```
+
+| Setting | What it does |
+|---|---|
+| `DefaultSearchEngine` | Engine used by the hotkey and by <kbd>Enter</kbd>. Must match an engine's `Name`, or the first engine is used |
+| `Culture` | UI language: `en-US` or `ru-RU` |
+| `AllowedFullscreenApps` | Full-screen apps the pop-up may still appear over. An entry matches any process whose name contains it, ignoring case |
+| `Popup` | `DefaultWidth`, `DefaultHeight` and `VerticalOffsetFromCursor`, in pixels. Set any subset |
+
+- **A list replaces the default list.** The example above allows exactly `firefox` and `vlc`.
+  `[]` allows none.
+- **Only these four settings can be changed here.** Anything else in the file, such as
+  `SearchEngines` or `Serilog`, is ignored, and a warning in `log.txt` names it. Search engines
+  come with each release, together with the icons and page scripts they need.
+- **Mistakes stop startup with an error.** Malformed JSON, or an unknown `Culture`, shows an error
+  when Translator starts. For JSON errors, the message names the file. Comments and trailing
+  commas are fine.
+
+### Upgrading from an older release
+
+Releases before this change kept these settings in `appsettings.json` in the install folder, and
+each update overwrote that file. The update to this version overwrites it one last time. If you
+had changed it, copy your changes into `usersettings.json` in the new flat format shown above.
 
 ## Credits
 

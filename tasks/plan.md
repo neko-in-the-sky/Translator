@@ -76,7 +76,7 @@ parallel.
 ### Phase 3: Discoverability
 - [x] T5: Create the starter file on first run
 - [x] T6: "Open settings folder" tray item
-- [ ] T7: README section and migration note
+- [x] T7: README section and migration note
 
 ### Checkpoint C (done)
 - [ ] All 14 spec tests pass in Debug and Release.
