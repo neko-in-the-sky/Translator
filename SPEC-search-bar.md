@@ -15,8 +15,7 @@ the page fill the window below it.
 
 1. **Layout:** the toolbar has 12 px padding on the left, right and top, and 10 px at the bottom.
    A 1 px divider in `DividerBrush` runs the full width under it. The page fills everything below,
-   edge to edge, with no margin. The loading bar row from no-flash sits between the divider and
-   the page.
+   edge to edge, with no margin.
 2. **Box:** 32 px tall, corner radius 4, `Segoe UI Variable Text` 14 px, text vertically centred,
    8 px padding on the left. At rest it has a 1 px `ControlBorderBrush` border. On hover the
    background darkens slightly. With keyboard focus the bottom border becomes 2 px in `AccentBrush`,
@@ -38,8 +37,9 @@ the page fill the window below it.
 
 ## Design
 
-- `Translator/Styles/Popup.xaml`, created by no-flash, gains the other colour resources
-  (Windows 11's light theme colours, flattened onto white: text, placeholder, divider, control
+- `Translator/Styles/Popup.xaml` (new) holds `AccentBrush` with its `#005FB8` fallback, which
+  `MainWindow` replaces with the colour from `AccentColor.TryGet()` (see SPEC.md), and the other
+  colour resources (Windows 11's light theme colours, flattened onto white: text, placeholder, divider, control
   fill/hover/focused/border, subtle fill/hover/pressed), font families (`TextFontFamily`,
   `IconFontFamily`), `FocusVisualStyle`, `SearchBoxStyle` (a `TextBox` template) and
   `IconButtonStyle`. The placeholder text reaches the template through the `TextBox`'s `Tag`, so
@@ -55,7 +55,7 @@ the page fill the window below it.
 
 ## Files
 
-`Translator/Styles/Popup.xaml`, `Translator/MainWindow.xaml(.cs)`,
+`Translator/Styles/Popup.xaml` (new), `Translator/AccentColor.cs` (new), `Translator/MainWindow.xaml(.cs)`,
 `Translator/MainWindowViewModel.cs`, `Translator/Properties/Resources.resx`,
 `Resources.ru-RU.resx`, `Resources.Designer.cs`, `Translator.Tests/ResourcesTests.cs`,
 `Translator.Tests/MainWindowViewModelTests.cs`.

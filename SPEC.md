@@ -1,15 +1,22 @@
 # Capability Map: A more modern pop-up
 
-This is the index for three changes to the pop-up. They go in one branch (`popup-style`) and one PR.
+This is the index for two changes to the pop-up. They go in one branch (`popup-style`) and one PR.
 Each module has its own spec. This file holds what they share.
 
 | Module id | Responsibility | Depends on | Spec |
 |---|---|---|---|
-| no-flash | Keep the page hidden until it's ready; show a loading bar meanwhile. Creates `Popup.xaml` and the accent colour | — | [SPEC-no-flash.md](SPEC-no-flash.md) |
-| search-bar | Search box look and behaviour, toolbar layout, the other shared colours and button styles | — | [SPEC-search-bar.md](SPEC-search-bar.md) |
+| search-bar | Search box look and behaviour, toolbar layout, the accent colour, shared colours and button styles | — | [SPEC-search-bar.md](SPEC-search-bar.md) |
 | engine-buttons | Engine button look, grouping and the highlight on the engine being shown | search-bar | [SPEC-engine-buttons.md](SPEC-engine-buttons.md) |
 
-Build order: no-flash → search-bar → engine-buttons, one or more commits each.
+Build order: search-bar → engine-buttons, one or more commits each.
+
+**Dropped: no-flash.** A third module was to keep the page hidden until the site script had
+cleaned it up, with a loading bar meanwhile. It was built, but the user's check still showed a
+brief flash, first of the previous entry (a hidden WebView2 stops drawing, so its first frame on
+being shown was stale) and then, after parking the page off-screen instead, of something too
+quick to identify. The user dropped it: the site scripts, which remove elements only once at
+`DOMContentLoaded`, need improving first, and that's out of scope here. It's in this branch's
+history (`fff02b0`, `6a18832`) if it's picked up again.
 
 ## Shared decisions
 
@@ -25,7 +32,7 @@ Build order: no-flash → search-bar → engine-buttons, one or more commits eac
 - **Fonts:** `Segoe UI Variable Text, Segoe UI` for text. `Segoe Fluent Icons, Segoe MDL2 Assets`
   for glyphs, so Windows 10 falls back to its own icon font. No new image files.
 - **Airspace:** WebView2 is a native window, and WPF can't draw on top of it. Nothing may overlap
-  the page area: the loading bar, dividers and anything else get their own rows.
+  the page area: dividers and anything else get their own rows.
 - **Out of scope:** dark mode, a .NET upgrade, the tray menu, the confirmation page's HTML,
   replacing engine icons.
 
@@ -81,6 +88,6 @@ public bool IsActive
 
 ## Delivery
 
-When the user has checked all three modules by hand, turn the specs into
-`docs/adr/0005-popup-style.md`, delete the four `SPEC*.md` files, and open one PR after the user
+When the user has checked both modules by hand, turn the specs into
+`docs/adr/0005-popup-style.md`, delete the three `SPEC*.md` files, and open one PR after the user
 agrees.

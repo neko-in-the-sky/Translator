@@ -43,7 +43,6 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -119,17 +118,9 @@
                 </Grid>
             </Border>
 
-            <!-- Its own row, because WPF can't draw over the WebView2. Hidden rather than collapsed, so
-                 the page doesn't move when loading ends. -->
-            <ProgressBar
-                Name="LoadingBar"
-                Grid.Row="1"
-                Style="{StaticResource LoadingBarStyle}"
-                Visibility="Hidden" />
-
             <wpf:WebView2
                 Name="WebBrowser"
-                Grid.Row="2"
+                Grid.Row="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"

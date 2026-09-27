@@ -19,18 +19,12 @@ namespace Translator;
 /// </summary>
 public partial class MainWindow : Window
 {
-    /// <summary>
-    /// How far below its place the page is parked while loading. Any distance past the window's height works.
-    /// </summary>
-    private const double ParkedPageOffset = 10000;
-
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly BlocklistManager _blocklistManager;
     private readonly JavaScriptProvider _javaScriptProvider;
     private readonly ILogger<MainWindow> _logger;
     private readonly PopupSizeLocationProvider _popupSizeLocationProvider;
     private readonly IConfiguration _configuration;
-    private ulong _currentNavigationId;
 
     public MainWindow(MainWindowViewModel mainWindowViewModel, PopupSizeLocationProvider popupSizeLocationProvider,
         BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, IConfiguration configuration,
@@ -98,6 +92,7 @@ public partial class MainWindow : Window
             ShowWindow();
             if (!string.IsNullOrEmpty(args.Url))
             {
+                NavigateToBlankPage();
                 NavigateToUrl(args.Url);
             }
             else if (!string.IsNullOrEmpty(args.Page))
@@ -131,65 +126,15 @@ public partial class MainWindow : Window
                 }
             };
 
-            // The page stays hidden from the start of a navigation until the site script has removed the
-            // site's own header and ads, so neither a blank page nor the uncleaned layout ever shows.
-            WebBrowser.CoreWebView2.NavigationStarting += (_, navigationStartingArgs) =>
+            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, _) =>
             {
-                _currentNavigationId = navigationStartingArgs.NavigationId;
-                HidePage();
-            };
-
-            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, domContentLoadedArgs) =>
-            {
-                try
+                var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
+                if (js != null)
                 {
-                    var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
-                    if (js != null)
-                    {
-                        await WebBrowser.ExecuteScriptAsync(js);
-                    }
-                }
-                finally
-                {
-                    RevealPage(domContentLoadedArgs.NavigationId);
+                    await WebBrowser.ExecuteScriptAsync(js);
                 }
             };
-
-            // Covers navigations that fail or never reach DOMContentLoaded, so the page never stays hidden.
-            WebBrowser.CoreWebView2.NavigationCompleted += (_, navigationCompletedArgs) =>
-                RevealPage(navigationCompletedArgs.NavigationId);
         };
-    }
-
-    /// <summary>
-    /// Parks the page below the window, where Windows clips it away, instead of hiding it. A hidden WebView2
-    /// stops drawing, and when shown again its first frame is the page it last drew: the previous entry.
-    /// A parked one keeps drawing, at the same size, so it's up to date when it comes back.
-    /// </summary>
-    private void HidePage()
-    {
-        WebBrowser.Margin = new Thickness(0, ParkedPageOffset, 0, -ParkedPageOffset);
-        LoadingBar.Visibility = Visibility.Visible;
-    }
-
-    private void RevealPage(ulong navigationId)
-    {
-        // Switching engines cancels the previous navigation, and its NavigationCompleted can arrive after the
-        // new one has started. Only the latest navigation may reveal the page.
-        if (navigationId != _currentNavigationId)
-        {
-            return;
-        }
-
-        // HideWindow navigates to about:blank as the window goes away. Revealing that page would make the
-        // next pop-up start with the page visible, so nothing is revealed while the window is hidden.
-        if (!IsVisible)
-        {
-            return;
-        }
-
-        WebBrowser.Margin = new Thickness(0);
-        LoadingBar.Visibility = Visibility.Hidden;
     }
 
     private void ShowWindow()
@@ -210,7 +155,6 @@ public partial class MainWindow : Window
     {
         if (IsVisible)
         {
-            HidePage();
             NavigateToBlankPage();
             Hide();
         }
