@@ -38,14 +38,11 @@ the page fill the window below it.
 
 ## Design
 
-- `Translator/Styles/Popup.xaml` (new) holds, for the whole module map: colour resources
-  (`AccentColor`/`AccentBrush`, `DividerBrush`, `ControlBorderBrush`, `ControlHoverBrush`,
+- `Translator/Styles/Popup.xaml`, created by no-flash, gains the other colour resources
+  (`DividerBrush`, `ControlBorderBrush`, `ControlHoverBrush`,
   `PlaceholderBrush`, `SubtleFillBrush`, `SubtlePressedBrush`), font families (`TextFontFamily`,
   `IconFontFamily`), `SearchBoxStyle` (a `TextBox` template) and `IconButtonStyle`.
-  `MainWindow.Resources` merges it.
-- `AccentColor` is set at startup from the Windows accent colour (see SPEC.md) before the window
-  is created, by replacing the resource in `App.OnStartup`. `Popup.xaml` holds the `#005FB8`
-  fallback.
+  `AccentBrush` is always used as a `DynamicResource` (see SPEC.md).
 - The clear and magnifier buttons are part of `SearchBoxStyle`'s template. The magnifier binds
   `Command` to `DefaultSearchCommand.Command` through the `TextBox`'s `DataContext`. The clear
   button runs a new `ClearQueryCommand` on `MainWindowViewModel` that sets `QueryText` to empty.
@@ -56,7 +53,7 @@ the page fill the window below it.
 
 ## Files
 
-`Translator/Styles/Popup.xaml` (new), `Translator/MainWindow.xaml(.cs)`, `Translator/App.xaml(.cs)`,
+`Translator/Styles/Popup.xaml`, `Translator/MainWindow.xaml(.cs)`,
 `Translator/MainWindowViewModel.cs`, `Translator/Properties/Resources.resx`,
 `Resources.ru-RU.resx`, `Resources.Designer.cs`, `Translator.Tests/ResourcesTests.cs`,
 `Translator.Tests/MainWindowViewModelTests.cs`.

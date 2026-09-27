@@ -1,0 +1,64 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Colours, brushes and styles for the pop-up. The light theme is the only one so far, so a dark
+         theme only has to swap this file's colours. -->
+
+    <!-- The fallback for when Windows can't provide its accent colour. MainWindow replaces it with the
+         real one, so AccentBrush must always be used as a DynamicResource. -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#005FB8" />
+
+    <!-- A 2 px bar with an accent segment sliding left to right, like Windows 11's indeterminate
+         progress bar. The segment is an opacity mask moved across a full-width accent rectangle,
+         because a mask's transform can be relative to the bar's width and an animation's can't. -->
+    <Style x:Key="LoadingBarStyle" TargetType="ProgressBar">
+        <Setter Property="Height" Value="2" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Rectangle x:Name="Indicator" Fill="{DynamicResource AccentBrush}">
+                        <Rectangle.OpacityMask>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <LinearGradientBrush.RelativeTransform>
+                                    <TranslateTransform X="-1" />
+                                </LinearGradientBrush.RelativeTransform>
+                                <GradientStop Offset="0.35" Color="Transparent" />
+                                <GradientStop Offset="0.35" Color="Black" />
+                                <GradientStop Offset="0.65" Color="Black" />
+                                <GradientStop Offset="0.65" Color="Transparent" />
+                            </LinearGradientBrush>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <ControlTemplate.Triggers>
+                        <!-- Animate only while the bar is on screen. -->
+                        <Trigger Property="IsVisible" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="Slide">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="Indicator"
+                                            Storyboard.TargetProperty="(UIElement.OpacityMask).(Brush.RelativeTransform).(TranslateTransform.X)"
+                                            From="-0.65"
+                                            To="0.65"
+                                            Duration="0:0:1.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <SineEase EasingMode="EaseInOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="Slide" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

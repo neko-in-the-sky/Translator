@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,7 @@ public partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger;
     private readonly PopupSizeLocationProvider _popupSizeLocationProvider;
     private readonly IConfiguration _configuration;
+    private ulong _currentNavigationId;
 
     public MainWindow(MainWindowViewModel mainWindowViewModel, PopupSizeLocationProvider popupSizeLocationProvider,
         BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, IConfiguration configuration,
@@ -46,6 +48,17 @@ public partial class MainWindow : Window
 
         InitializeComponent();
         InitializeWebView2();
+
+        // Stored in the window's own resources, which take precedence over Popup.xaml's fallback.
+        var accentColor = AccentColor.TryGet();
+        if (accentColor != null)
+        {
+            Resources["AccentBrush"] = new SolidColorBrush(accentColor.Value);
+        }
+        else
+        {
+            _logger.LogWarning("Unable to read the Windows accent colour; using the default blue");
+        }
 
         DataContext = _mainWindowViewModel;
 
@@ -80,7 +93,6 @@ public partial class MainWindow : Window
             ShowWindow();
             if (!string.IsNullOrEmpty(args.Url))
             {
-                NavigateToBlankPage();
                 NavigateToUrl(args.Url);
             }
             else if (!string.IsNullOrEmpty(args.Page))
@@ -114,15 +126,60 @@ public partial class MainWindow : Window
                 }
             };
 
-            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, _) =>
+            // The page stays hidden from the start of a navigation until the site script has removed the
+            // site's own header and ads, so neither a blank page nor the uncleaned layout ever shows.
+            WebBrowser.CoreWebView2.NavigationStarting += (_, navigationStartingArgs) =>
             {
-                var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
-                if (js != null)
+                _currentNavigationId = navigationStartingArgs.NavigationId;
+                HidePage();
+            };
+
+            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, domContentLoadedArgs) =>
+            {
+                try
                 {
-                    await WebBrowser.ExecuteScriptAsync(js);
+                    var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
+                    if (js != null)
+                    {
+                        await WebBrowser.ExecuteScriptAsync(js);
+                    }
+                }
+                finally
+                {
+                    RevealPage(domContentLoadedArgs.NavigationId);
                 }
             };
+
+            // Covers navigations that fail or never reach DOMContentLoaded, so the page never stays hidden.
+            WebBrowser.CoreWebView2.NavigationCompleted += (_, navigationCompletedArgs) =>
+                RevealPage(navigationCompletedArgs.NavigationId);
         };
+    }
+
+    private void HidePage()
+    {
+        WebBrowser.Visibility = Visibility.Hidden;
+        LoadingBar.Visibility = Visibility.Visible;
+    }
+
+    private void RevealPage(ulong navigationId)
+    {
+        // Switching engines cancels the previous navigation, and its NavigationCompleted can arrive after the
+        // new one has started. Only the latest navigation may reveal the page.
+        if (navigationId != _currentNavigationId)
+        {
+            return;
+        }
+
+        // HideWindow navigates to about:blank as the window goes away. Revealing that page would make the
+        // next pop-up start with the page visible, so nothing is revealed while the window is hidden.
+        if (!IsVisible)
+        {
+            return;
+        }
+
+        WebBrowser.Visibility = Visibility.Visible;
+        LoadingBar.Visibility = Visibility.Hidden;
     }
 
     private void ShowWindow()
@@ -143,6 +200,7 @@ public partial class MainWindow : Window
     {
         if (IsVisible)
         {
+            HidePage();
             NavigateToBlankPage();
             Hide();
         }

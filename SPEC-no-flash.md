@@ -26,7 +26,8 @@ and the page appears once, already cleaned up.
    are never visible.
 4. If a navigation fails or `DOMContentLoaded` never fires, the page (or WebView2's error page) is
    still shown at `NavigationCompleted`, and the bar stops. The page never stays hidden.
-5. The `about:blank` step never shows the page and never stops the bar.
+5. Nothing shows the page or stops the bar before the requested page is ready. In particular, the
+   `about:blank` navigation when the window hides doesn't.
 6. Hiding with <kbd>Esc</kbd> or clicking away still clears the page, and the next pop-up never
    shows the previous entry, not even for a frame.
 7. When nothing is loading, the bar's row is empty, not a grey track.
@@ -34,11 +35,22 @@ and the page appears once, already cleaned up.
 ## Design
 
 ```
-NavigationStarting (any URL)           → WebBrowser.Visibility = Hidden, LoadingBar.Visible
-DOMContentLoaded, not about:blank      → run the site script (as today), then RevealPage()
-NavigationCompleted, not about:blank   → RevealPage()      (fallback for failures)
-RevealPage()                           → WebBrowser.Visibility = Visible, LoadingBar.Collapsed
+NavigationStarting    → HidePage(): WebBrowser.Visibility = Hidden, loading bar shown
+DOMContentLoaded      → run the site script (as today), then RevealPage()
+NavigationCompleted   → RevealPage()      (fallback for failures)
+RevealPage(id)        → only for the latest navigation (the id NavigationStarting last saw),
+                        because a cancelled one can complete after its replacement starts,
+                        and only while the window is visible:
+                        WebBrowser.Visibility = Visible, loading bar hidden
+HideWindow()          → HidePage(), navigate to about:blank, Hide()   (as today, plus HidePage)
 ```
+
+- **The `about:blank` step before each search is removed.** It was there to clear the previous
+  entry, which hiding the page now does. Keeping it would need a reliable way to tell it apart
+  from the confirmation page, and `NavigateToString` pages also report `about:blank` as their
+  address. The `about:blank` navigation when the window hides stays. It stops the old page (and
+  any sound) and frees memory. Because `RevealPage()` does nothing while the window is hidden,
+  that navigation can't make the page visible again, and the next pop-up starts with it hidden.
 
 - `Hidden`, not `Collapsed`, so the layout doesn't change. The WPF WebView2 control passes its
   visibility to `CoreWebView2Controller.IsVisible`. Navigation and scripts keep running while
@@ -48,14 +60,16 @@ RevealPage()                           → WebBrowser.Visibility = Visible, Load
   keeps the WebView visible and hides the document instead: a document-created script
   (`AddScriptToExecuteOnDocumentCreatedAsync`) adds `html { visibility: hidden }`, and
   `RevealPage()` removes it with `ExecuteScriptAsync`.
-- The existing `about:blank` step stays. The hidden page makes it invisible, and removing it isn't
-  needed for this change.
-- The loading bar is a `ProgressBar` with `IsIndeterminate="True"` and its own template, in its own
-  2 px grid row. Its style is `LoadingBarStyle` in `Popup.xaml`.
+- The loading bar is a `ProgressBar` with its own template, in its own 2 px grid row. Its style is
+  `LoadingBarStyle` in `Popup.xaml`. The template slides an accent segment across by animating an
+  opacity mask, and the animation runs only while the bar is visible.
+- This module creates `Popup.xaml` with `AccentBrush` and `LoadingBarStyle`, and
+  `AccentColor.TryGet()`, which reads the Windows accent colour.
 
 ## Files
 
-`Translator/MainWindow.xaml`, `Translator/MainWindow.xaml.cs`, `Translator/Styles/Popup.xaml`.
+`Translator/MainWindow.xaml`, `Translator/MainWindow.xaml.cs`, `Translator/Styles/Popup.xaml` (new),
+`Translator/AccentColor.cs` (new).
 
 ## Testing
 

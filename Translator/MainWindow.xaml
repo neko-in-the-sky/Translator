@@ -30,10 +30,16 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <Style
-            x:Key="FlatButtonStyle"
-            BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-            TargetType="Button" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/Popup.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style
+                x:Key="FlatButtonStyle"
+                BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                TargetType="Button" />
+        </ResourceDictionary>
     </Window.Resources>
 
     <!-- Where Windows rounds the corners it also draws a thin border, and this one is removed. -->
@@ -41,6 +47,7 @@
 
         <Grid Margin="5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -105,10 +112,18 @@
                 </ItemsControl>
             </Grid>
 
+            <!-- Its own row, because WPF can't draw over the WebView2. Hidden rather than collapsed, so
+                 the page doesn't move when loading ends. -->
+            <ProgressBar
+                Name="LoadingBar"
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                Style="{StaticResource LoadingBarStyle}"
+                Visibility="Hidden" />
+
             <wpf:WebView2
                 Name="WebBrowser"
-                Grid.Row="1"
-                Margin="0,10,0,0"
+                Grid.Row="2"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"

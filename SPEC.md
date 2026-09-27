@@ -5,8 +5,8 @@ Each module has its own spec. This file holds what they share.
 
 | Module id | Responsibility | Depends on | Spec |
 |---|---|---|---|
-| no-flash | Keep the page hidden until it's ready; show a loading bar meanwhile | — | [SPEC-no-flash.md](SPEC-no-flash.md) |
-| search-bar | Search box look and behaviour, toolbar layout, shared colours and button styles | — | [SPEC-search-bar.md](SPEC-search-bar.md) |
+| no-flash | Keep the page hidden until it's ready; show a loading bar meanwhile. Creates `Popup.xaml` and the accent colour | — | [SPEC-no-flash.md](SPEC-no-flash.md) |
+| search-bar | Search box look and behaviour, toolbar layout, the other shared colours and button styles | — | [SPEC-search-bar.md](SPEC-search-bar.md) |
 | engine-buttons | Engine button look, grouping and the highlight on the engine being shown | search-bar | [SPEC-engine-buttons.md](SPEC-engine-buttons.md) |
 
 Build order: no-flash → search-bar → engine-buttons, one or more commits each.
@@ -15,10 +15,13 @@ Build order: no-flash → search-bar → engine-buttons, one or more commits eac
 
 - **Light theme only.** Every colour is a named resource in `Translator/Styles/Popup.xaml`, so a
   dark theme can later swap them in one place.
-- **Accent colour:** the Windows accent colour, read once at startup with
-  `Windows.UI.ViewManagement.UISettings.GetColorValue(UIColorType.Accent)`. The target framework
-  (`net8.0-windows10.0.17763.0`) already includes it. If the call fails, use `#005FB8`, the Windows 11
-  default. It isn't updated while the app runs.
+- **Accent colour:** the shade of the Windows accent colour that Windows 11's light theme uses for
+  controls, read once when the window is created with
+  `Windows.UI.ViewManagement.UISettings.GetColorValue(UIColorType.AccentDark1)`. The target
+  framework (`net8.0-windows10.0.17763.0`) already includes it. If the call fails, use `#005FB8`,
+  that shade of the default blue. It isn't updated while the app runs. The window stores it as
+  `AccentBrush` in its own resources, which override `Popup.xaml`'s fallback, so every use of
+  `AccentBrush` is a `DynamicResource`.
 - **Fonts:** `Segoe UI Variable Text, Segoe UI` for text. `Segoe Fluent Icons, Segoe MDL2 Assets`
   for glyphs, so Windows 10 falls back to its own icon font. No new image files.
 - **Airspace:** WebView2 is a native window, and WPF can't draw on top of it. Nothing may overlap
