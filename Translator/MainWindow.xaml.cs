@@ -3,10 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
 using Translator.Blocklist;
 using Translator.Configuration;
+using Translator.Logging;
 
 namespace Translator;
 
@@ -20,14 +22,17 @@ public partial class MainWindow : Window
     private readonly JavaScriptProvider _javaScriptProvider;
     private readonly ILogger<MainWindow> _logger;
     private readonly PopupSizeLocationProvider _popupSizeLocationProvider;
+    private readonly IConfiguration _configuration;
 
     public MainWindow(MainWindowViewModel mainWindowViewModel, PopupSizeLocationProvider popupSizeLocationProvider,
-        BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, ILogger<MainWindow> logger)
+        BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, IConfiguration configuration,
+        ILogger<MainWindow> logger)
     {
         _mainWindowViewModel = mainWindowViewModel;
         _popupSizeLocationProvider = popupSizeLocationProvider;
         _blocklistManager = blocklistManager;
         _javaScriptProvider = javaScriptProvider;
+        _configuration = configuration;
         _logger = logger;
 
         _mainWindowViewModel.NavigationRequested += OnNavigationRequested;
@@ -215,6 +220,27 @@ public partial class MainWindow : Window
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             _logger.LogWarning(exception, "Unable to open the settings folder {Path}", directoryPath);
+        }
+    }
+
+    private void MenuItemOpenLogsFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var directoryPath = LogFolder.Find(_configuration);
+        if (directoryPath == null)
+        {
+            _logger.LogWarning("Unable to open the logs folder: no File sink with a path is configured");
+            return;
+        }
+
+        try
+        {
+            // Serilog creates the folder when it opens a log file, but it may not have done so yet.
+            Directory.CreateDirectory(directoryPath);
+            Process.Start("explorer.exe", directoryPath);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogWarning(exception, "Unable to open the logs folder {Path}", directoryPath);
         }
     }
 

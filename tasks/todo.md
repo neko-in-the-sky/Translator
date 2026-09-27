@@ -101,8 +101,8 @@ Run:   dotnet run --project Translator -c Debug
   - The handler opens the folder `LogFolder.Find` returns, and creates it first if it's missing.
 
   **Verification:**
-  - [ ] Build succeeds in Debug
-  - [ ] Tests pass
+  - [x] Build succeeds in Debug
+  - [x] Tests pass
   - [ ] Manual: `Run`, then use the tray item and check that Explorer opens `%LOCALAPPDATA%\Translator\Logs`
   - [ ] Manual: point the File sink in `bin\Debug\…\appsettings.json` at a folder that can't be
         created, such as a path under a file. `Run`, and use the tray item: a warning is logged to the

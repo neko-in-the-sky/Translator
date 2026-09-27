@@ -17,4 +17,15 @@ public class ResourcesTests
 
         Assert.Equal(expected, text);
     }
+
+    [Theory]
+    [InlineData("en-US", "Open logs folder")]
+    [InlineData("ru-RU", "Открыть папку логов")]
+    public void OpenLogsFolder_IsLocalised(string culture, string expected)
+    {
+        var text = Resources.ResourceManager.GetString(
+            nameof(Resources.TrayIcon_MenuItem_OpenLogsFolder), CultureInfo.GetCultureInfo(culture));
+
+        Assert.Equal(expected, text);
+    }
 }
