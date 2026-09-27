@@ -55,7 +55,7 @@ Build-Release.ps1 + minimal Translator.iss (T1)
 
 ### Phase 2: Installer features
 - [x] T3: Add the shortcut, startup and launch options, and Russian
-- [ ] T4: Warn when the WebView2 Runtime is missing
+- [x] T4: Warn when the WebView2 Runtime is missing
 
 ### Checkpoint B
 - [ ] The installer job is green, and SPEC manual checks 1–6 pass on this machine.

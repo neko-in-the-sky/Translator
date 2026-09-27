@@ -7,6 +7,8 @@
 #ifndef PublishDir
   #define PublishDir "..\artifacts\publish"
 #endif
+; Define SimulateMissingWebView2 (/DSimulateMissingWebView2) to test the prompt on a machine that has
+; the Runtime. Never for a release.
 
 [Setup]
 ; Windows recognises an upgrade by this id. Never change it.
@@ -49,6 +51,8 @@ en.StartWithWindows=Start Translator when Windows starts
 ru.StartWithWindows=Запускать Translator при входе в Windows
 en.CloseTranslatorOnUninstall=Translator is running and will be closed so that it can be uninstalled.
 ru.CloseTranslatorOnUninstall=Translator запущен и будет закрыт, чтобы его можно было удалить.
+en.WebView2Missing=Translator shows dictionary pages with the Microsoft Edge WebView2 Runtime, which isn't installed on this computer.%n%nOpen its download page? Setup will continue either way, and you can install the Runtime before or after Translator.
+ru.WebView2Missing=Translator показывает словарные страницы с помощью Microsoft Edge WebView2 Runtime, а она не установлена на этом компьютере.%n%nОткрыть страницу загрузки? Установка продолжится в любом случае, а WebView2 Runtime можно установить до или после Translator.
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -78,6 +82,48 @@ Filename: "{app}\Translator.exe"; Description: "{cm:LaunchProgram,Translator}"; 
 Type: filesandordirs; Name: "{app}\Translator.exe.WebView2"
 
 [Code]
+const
+  WebView2ClientKey = 'Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}';
+  WebView2DownloadUrl = 'https://developer.microsoft.com/microsoft-edge/webview2/consumer/';
+
+var
+  WebView2Checked: Boolean;
+
+function HasWebView2Version(RootKey: Integer; SubKey: String): Boolean;
+var
+  Version: String;
+begin
+  Result := RegQueryStringValue(RootKey, SubKey, 'pv', Version)
+    and (Version <> '') and (Version <> '0.0.0.0');
+end;
+
+// Microsoft's documented check ("Detect if a WebView2 Runtime is already installed"): a version in
+// either the per-machine key, which is in the 32-bit registry view, or the per-user key.
+function IsWebView2Installed: Boolean;
+begin
+#ifdef SimulateMissingWebView2
+  Result := False;
+#else
+  Result := HasWebView2Version(HKLM32, 'SOFTWARE\' + WebView2ClientKey)
+    or HasWebView2Version(HKCU, 'Software\' + WebView2ClientKey);
+#endif
+end;
+
+// On the Ready page rather than at start-up, so the user has seen what they are installing first.
+// Asked once, even if the user goes back and forth, and never in a silent install.
+procedure CurPageChanged(CurPageID: Integer);
+var
+  ErrorCode: Integer;
+begin
+  if (CurPageID = wpReady) and not WebView2Checked and not WizardSilent then
+  begin
+    WebView2Checked := True;
+    if not IsWebView2Installed then
+      if MsgBox(CustomMessage('WebView2Missing'), mbInformation, MB_YESNO) = IDYES then
+        ShellExec('open', WebView2DownloadUrl, '', '', SW_SHOWNORMAL, ewNoWait, ErrorCode);
+  end;
+end;
+
 // Setup closes a running Translator through Restart Manager, but the uninstaller doesn't: it would
 // leave the program files locked. So the uninstaller ends Translator itself. It keeps no unsaved
 // state. Only a Translator started from this install folder is matched, so a copy unzipped

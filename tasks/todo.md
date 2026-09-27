@@ -109,7 +109,8 @@ Tests:  dotnet test Translator.sln -c Debug
   - Every label in the installer comes from `.isl` files or `[CustomMessages]`. None is hard-coded.
 
   **Verification:**
-  - [x] `Build` and `Smoke` pass locally, and CI is green
+  - [x] `Build` and `Smoke` pass locally
+  - [ ] CI is green
   - [ ] Manual check 1: English, tasks unticked by default, launch on finish
   - [ ] Manual check 3: `setup.exe /LANG=ru`, the wizard and the two task labels are in Russian
 
@@ -121,7 +122,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** S
 
-- [ ] **T4: Warn when the WebView2 Runtime is missing**
+- [x] **T4: Warn when the WebView2 Runtime is missing**
 
   **Description:** In `[Code]`, `IsWebView2Installed` reads `pv` from the HKLM `WOW6432Node` key
   and the HKCU key (SPEC → Design) and treats empty or `0.0.0.0` as missing. `#ifdef
@@ -136,7 +137,8 @@ Tests:  dotnet test Translator.sln -c Debug
   - A silent install never prompts, so `Smoke` is unaffected.
 
   **Verification:**
-  - [ ] `Build` and `Smoke` pass, and CI is green
+  - [x] `Build` and `Smoke` pass locally; a `/DSimulateMissingWebView2` build compiles
+  - [ ] CI is green
   - [ ] Manual check 6: the simulated build in `en` and in `ru`, **Yes** opens the page, and **No**
         continues the install
 
