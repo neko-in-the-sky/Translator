@@ -60,6 +60,9 @@ if (Test-Path $uninstallKey) {
     throw "Translator is already installed for this user. Uninstall it before running the smoke test, which would otherwise remove it."
 }
 New-Item -ItemType Directory -Force $LogDir | Out-Null
+# The uninstaller reruns a copy of itself from a temp folder, where a relative /LOG path can't be
+# created, and then it exits with code 1.
+$LogDir = (Resolve-Path $LogDir).Path
 $createdSettingsDir = -not (Test-Path $settingsDir)
 New-Item -ItemType Directory -Force $settingsDir | Out-Null
 Set-Content -Path $marker -Value 'Written by the installer smoke test'
