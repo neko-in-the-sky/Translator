@@ -72,7 +72,7 @@ Tests:  dotnet test Translator.sln -c Debug
   - `%APPDATA%\Translator\marker.txt` survives the uninstall and is then deleted by the script.
 
   **Verification:**
-  - [ ] `Smoke` passes locally, and fails as expected with a check broken on purpose, which is
+  - [x] `Smoke` passes locally, and fails as expected with a check broken on purpose, which is
         then undone
   - [ ] Push the branch and open a draft PR: the `installer` job and the existing matrix are green
 
