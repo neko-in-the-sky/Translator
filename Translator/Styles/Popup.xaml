@@ -9,6 +9,169 @@
          real one, so AccentBrush must always be used as a DynamicResource. -->
     <SolidColorBrush x:Key="AccentBrush" Color="#005FB8" />
 
+    <!-- Windows 11's light theme colours, flattened onto a white background. -->
+    <SolidColorBrush x:Key="TextBrush" Color="#1B1B1B" />
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#5D5D5D" />
+    <SolidColorBrush x:Key="PlaceholderBrush" Color="#767676" />
+    <SolidColorBrush x:Key="DividerBrush" Color="#E5E5E5" />
+    <SolidColorBrush x:Key="ControlFillBrush" Color="#FBFBFB" />
+    <SolidColorBrush x:Key="ControlHoverBrush" Color="#F6F6F6" />
+    <SolidColorBrush x:Key="ControlFocusedBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ControlBorderBrush" Color="#E5E5E5" />
+    <SolidColorBrush x:Key="ControlStrongBorderBrush" Color="#8A8A8A" />
+    <SolidColorBrush x:Key="SubtleFillBrush" Color="#F3F3F3" />
+    <SolidColorBrush x:Key="SubtleHoverBrush" Color="#0F000000" />
+    <SolidColorBrush x:Key="SubtlePressedBrush" Color="#1A000000" />
+
+    <FontFamily x:Key="TextFontFamily">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <!-- Windows 10 has no Segoe Fluent Icons, but Segoe MDL2 Assets has the same glyphs at the same code points. -->
+    <FontFamily x:Key="IconFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <Style x:Key="FocusVisualStyle">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle
+                        Margin="-2"
+                        RadiusX="6"
+                        RadiusY="6"
+                        Stroke="{StaticResource TextBrush}"
+                        StrokeThickness="2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A borderless button that shows a rounded background only on hover and press, like Windows 11's
+         subtle buttons. Content is a glyph from IconFontFamily or an image. -->
+    <Style x:Key="IconButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource IconFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualStyle}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Chrome"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SubtleHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SubtlePressedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Windows 11's search box: rounded, a darker bottom edge that becomes a 2 px accent line with keyboard
+         focus, a placeholder, and clear and search buttons inside. The placeholder text comes from Tag, so
+         the style needs no knowledge of the app's strings. The buttons can't take focus, so clicking them
+         leaves the cursor in the box. -->
+    <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="FontFamily" Value="{StaticResource TextFontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+        <Setter Property="CaretBrush" Value="{StaticResource TextBrush}" />
+        <Setter Property="Background" Value="{StaticResource ControlFillBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Grid>
+                        <Border
+                            x:Name="Frame"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{StaticResource ControlBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4" />
+                        <Border
+                            x:Name="BottomEdge"
+                            BorderBrush="{StaticResource ControlStrongBorderBrush}"
+                            BorderThickness="0,0,0,1"
+                            CornerRadius="4" />
+                        <Border
+                            x:Name="FocusLine"
+                            BorderBrush="{DynamicResource AccentBrush}"
+                            BorderThickness="0,0,0,2"
+                            CornerRadius="4"
+                            Visibility="Collapsed" />
+
+                        <Grid Margin="8,0,4,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- The text box's own view indents text by 2 px, so the placeholder does too. -->
+                            <TextBlock
+                                x:Name="Placeholder"
+                                Grid.Column="0"
+                                Margin="2,0,0,0"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource PlaceholderBrush}"
+                                IsHitTestVisible="False"
+                                Text="{TemplateBinding Tag}"
+                                Visibility="Collapsed" />
+                            <ScrollViewer
+                                x:Name="PART_ContentHost"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Focusable="False"
+                                HorizontalScrollBarVisibility="Hidden"
+                                VerticalScrollBarVisibility="Hidden" />
+
+                            <Button
+                                x:Name="ClearButton"
+                                Grid.Column="1"
+                                Width="24"
+                                Height="24"
+                                Command="{Binding ClearQueryCommand}"
+                                Content="&#xE711;"
+                                Focusable="False"
+                                Style="{StaticResource IconButtonStyle}" />
+                            <Button
+                                Grid.Column="2"
+                                Width="24"
+                                Height="24"
+                                Command="{Binding DefaultSearchCommand.Command}"
+                                Content="&#xE721;"
+                                Focusable="False"
+                                Style="{StaticResource IconButtonStyle}" />
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ControlHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ControlFocusedBrush}" />
+                            <Setter TargetName="BottomEdge" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="FocusLine" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- A 2 px bar with an accent segment sliding left to right, like Windows 11's indeterminate
          progress bar. The segment is an opacity mask moved across a full-width accent rectangle,
          because a mask's transform can be relative to the bar's width and an animation's can't. -->

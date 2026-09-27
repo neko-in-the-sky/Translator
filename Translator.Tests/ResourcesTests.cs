@@ -28,4 +28,15 @@ public class ResourcesTests
 
         Assert.Equal(expected, text);
     }
+
+    [Theory]
+    [InlineData("en-US", "Word or phrase")]
+    [InlineData("ru-RU", "Слово или выражение")]
+    public void QueryTextBoxPlaceholder_IsLocalised(string culture, string expected)
+    {
+        var text = Resources.ResourceManager.GetString(
+            nameof(Resources.QueryTextBox_Placeholder), CultureInfo.GetCultureInfo(culture));
+
+        Assert.Equal(expected, text);
+    }
 }

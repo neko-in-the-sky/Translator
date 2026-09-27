@@ -58,4 +58,18 @@ public class MainWindowViewModelTests
 
         Assert.Contains("SearchEngines", exception.Message);
     }
+
+    [Fact]
+    public void ClearQueryCommand_EmptiesTheQueryAndNotifies()
+    {
+        var viewModel = CreateViewModel("Oxford", "Oxford");
+        viewModel.QueryText = "cat";
+        var changed = new List<string?>();
+        viewModel.PropertyChanged += (_, args) => changed.Add(args.PropertyName);
+
+        viewModel.ClearQueryCommand.Execute(null);
+
+        Assert.Equal(string.Empty, viewModel.QueryText);
+        Assert.Equal([nameof(MainWindowViewModel.QueryText)], changed);
+    }
 }

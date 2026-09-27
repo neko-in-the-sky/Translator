@@ -39,14 +39,16 @@ the page fill the window below it.
 ## Design
 
 - `Translator/Styles/Popup.xaml`, created by no-flash, gains the other colour resources
-  (`DividerBrush`, `ControlBorderBrush`, `ControlHoverBrush`,
-  `PlaceholderBrush`, `SubtleFillBrush`, `SubtlePressedBrush`), font families (`TextFontFamily`,
-  `IconFontFamily`), `SearchBoxStyle` (a `TextBox` template) and `IconButtonStyle`.
+  (Windows 11's light theme colours, flattened onto white: text, placeholder, divider, control
+  fill/hover/focused/border, subtle fill/hover/pressed), font families (`TextFontFamily`,
+  `IconFontFamily`), `FocusVisualStyle`, `SearchBoxStyle` (a `TextBox` template) and
+  `IconButtonStyle`. The placeholder text reaches the template through the `TextBox`'s `Tag`, so
+  the style doesn't depend on the app's strings.
   `AccentBrush` is always used as a `DynamicResource` (see SPEC.md).
 - The clear and magnifier buttons are part of `SearchBoxStyle`'s template. The magnifier binds
   `Command` to `DefaultSearchCommand.Command` through the `TextBox`'s `DataContext`. The clear
   button runs a new `ClearQueryCommand` on `MainWindowViewModel` that sets `QueryText` to empty.
-  Focus returns to the box from code-behind.
+  Neither button can take focus, so the cursor stays in the box without any code-behind.
 - New string `QueryTextBox_Placeholder` in `Resources.resx` and `Resources.ru-RU.resx`, with a
   hand-written property in `Resources.Designer.cs`.
 - `FlatButtonStyle` is removed once nothing uses it (after engine-buttons).

@@ -34,6 +34,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _notificationStateChecker = notificationStateChecker;
         _pageBuilder = pageBuilder;
         _logger = logger;
+        ClearQueryCommand = new RelayCommand(() => QueryText = string.Empty);
 
         var settings = applicationSettings.Value;
         if (settings.SearchEngines is not { Length: > 0 })
@@ -73,6 +74,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         get => _queryText;
         set => SetField(ref _queryText, value);
     }
+
+    public ICommand ClearQueryCommand { get; }
 
     public event Action<NavigationRequestedEventArgs> NavigationRequested;
 
