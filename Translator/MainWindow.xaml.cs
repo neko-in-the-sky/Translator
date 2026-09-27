@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using Hardcodet.Wpf.TaskbarNotification.Interop;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Web.WebView2.Core;
@@ -36,6 +37,12 @@ public partial class MainWindow : Window
         _logger = logger;
 
         _mainWindowViewModel.NavigationRequested += OnNavigationRequested;
+
+        // The tray icon library computes its DPI factor lazily, on first use, by creating a window, which pumps
+        // messages. If that first use is a tray click, the next click message reads the factor mid-computation and
+        // the menu opens in the wrong place. Computing it here, before InitializeComponent creates the tray icon,
+        // keeps it out of the message handler.
+        _ = SystemInfo.DpiFactorX;
 
         InitializeComponent();
         InitializeWebView2();
