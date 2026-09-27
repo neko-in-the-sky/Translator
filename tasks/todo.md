@@ -15,7 +15,7 @@ Run:   dotnet run --project Translator -c Debug
 
 ## Phase 1: Logs move and rotate
 
-- [ ] **T1: Write logs to `%LOCALAPPDATA%\Translator\Logs` with bounded rotation**
+- [x] **T1: Write logs to `%LOCALAPPDATA%\Translator\Logs` with bounded rotation**
 
   **Description:** Change the File sink in `appsettings.json` to
   `%LOCALAPPDATA%\Translator\Logs\log-.txt`, with `fileSizeLimitBytes: 10485760`,
@@ -32,9 +32,9 @@ Run:   dotnet run --project Translator -c Debug
   - `ShippedConfig_LimitsFileSizeTo10MB` passes, and nothing else in `appsettings.json` changes.
 
   **Verification:**
-  - [ ] Build succeeds in Debug (warnings are errors)
-  - [ ] Tests pass, including the existing `ShippedAppSettings_BindsEveryUserSetting`
-  - [ ] Manual: `Run`. `%LOCALAPPDATA%\Translator\Logs\log-<today>.txt` appears and has the startup
+  - [x] Build succeeds in Debug (warnings are errors)
+  - [x] Tests pass, including the existing `ShippedAppSettings_BindsEveryUserSetting`
+  - [x] Manual: `Run`. `%LOCALAPPDATA%\Translator\Logs\log-<today>.txt` appears and has the startup
         entries, and no new `log*.txt` appears in `Translator\bin\Debug\net8.0-windows10.0.17763.0\`
 
   **Dependencies:** None
@@ -49,8 +49,8 @@ Run:   dotnet run --project Translator -c Debug
   C# without approval.
 
 ### Checkpoint A
-- [ ] `dotnet test Translator.sln -c Debug` and `-c Release` both pass
-- [ ] The T1 manual check is done
+- [x] `dotnet test Translator.sln -c Debug` and `-c Release` both pass
+- [x] The T1 manual check is done
 - [ ] Review with the user before Phase 2
 
 ---

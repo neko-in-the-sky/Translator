@@ -38,10 +38,10 @@ appsettings.json File sink (T1)
 ## Task List
 
 ### Phase 1: Logs move and rotate
-- [ ] T1: Write logs to `%LOCALAPPDATA%\Translator\Logs` with bounded rotation
+- [x] T1: Write logs to `%LOCALAPPDATA%\Translator\Logs` with bounded rotation
 
 ### Checkpoint A
-- [ ] Tests pass in Debug and Release. A Debug run writes logs to the new folder and none to the exe folder.
+- [x] Tests pass in Debug and Release. A Debug run writes logs to the new folder and none to the exe folder.
 
 ### Phase 2: Tray access
 - [ ] T2: Find the logs folder from configuration
