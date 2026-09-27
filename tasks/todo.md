@@ -57,7 +57,7 @@ Run:   dotnet run --project Translator -c Debug
 
 ## Phase 2: Tray access
 
-- [ ] **T2: Find the logs folder from configuration**
+- [x] **T2: Find the logs folder from configuration**
 
   **Description:** Add `Translator/Logging/LogFolder.cs` with `Find(IConfiguration)`, as sketched
   in SPEC → Code Style. It looks for the first `Serilog:WriteTo` entry whose `Name` is `File`
@@ -73,8 +73,8 @@ Run:   dotnet run --project Translator -c Debug
   - `LogFolder.cs` has no log path or limit, and no `string?`, because nullable is off in the app project.
 
   **Verification:**
-  - [ ] Build succeeds in Debug
-  - [ ] Tests pass
+  - [x] Build succeeds in Debug
+  - [x] Tests pass
 
   **Dependencies:** T1, because `LogFolder_FindsShippedFolder` uses the new shipped path
 

@@ -3,6 +3,7 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Translator.Logging;
 
 namespace Translator.Tests;
 
@@ -102,5 +103,37 @@ public class LoggingTests : IDisposable
 
         Assert.Equal("10485760", args["fileSizeLimitBytes"]);
         Assert.Equal("Day", args["rollingInterval"]);
+    }
+
+    private static IConfiguration OneSink(string name, string? path) => new ConfigurationBuilder()
+        .AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["Serilog:WriteTo:0:Name"] = name,
+            ["Serilog:WriteTo:0:Args:path"] = path
+        })
+        .Build();
+
+    [Fact]
+    public void LogFolder_FindsShippedFolder()
+    {
+        Assert.Equal(LogsDirectory, LogFolder.Find(ShippedConfiguration()));
+    }
+
+    [Fact]
+    public void LogFolder_ResolvesRelativePathAgainstBaseDirectory()
+    {
+        // The app makes AppContext.BaseDirectory current, which is where Serilog puts a relative path.
+        Assert.Equal(
+            Path.Combine(AppContext.BaseDirectory, "logs"),
+            LogFolder.Find(OneSink("File", @"logs\log-.txt")));
+    }
+
+    [Theory]
+    [InlineData("Console", "log.txt")]
+    [InlineData("File", null)]
+    [InlineData("File", " ")]
+    public void LogFolder_ReturnsNullWithoutFileSink(string name, string? path)
+    {
+        Assert.Null(LogFolder.Find(OneSink(name, path)));
     }
 }

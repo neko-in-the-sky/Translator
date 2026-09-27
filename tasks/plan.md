@@ -44,7 +44,7 @@ appsettings.json File sink (T1)
 - [x] Tests pass in Debug and Release. A Debug run writes logs to the new folder and none to the exe folder.
 
 ### Phase 2: Tray access
-- [ ] T2: Find the logs folder from configuration
+- [x] T2: Find the logs folder from configuration
 - [ ] T3: Add the "Open logs folder" tray item
 
 ### Checkpoint B
