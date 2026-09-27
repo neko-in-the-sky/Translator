@@ -49,6 +49,14 @@ public partial class MainWindow : Window
 
         DataContext = _mainWindowViewModel;
 
+        SourceInitialized += (_, _) =>
+        {
+            if (WindowCorners.TryRound(this))
+            {
+                WindowBorder.BorderThickness = new Thickness(0);
+            }
+        };
+
         Top = 100000;
         Left = 100000;
         Loaded += (_, _) =>
