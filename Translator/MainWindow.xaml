@@ -34,11 +34,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Popup.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <Style
-                x:Key="FlatButtonStyle"
-                BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                TargetType="Button" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -89,29 +84,38 @@
                         Text="{Binding Path=QueryText, UpdateSourceTrigger=PropertyChanged}"
                         ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}" />
 
-                    <ItemsControl ItemsSource="{Binding SearchCommands}"
-                                  Grid.Column="1"
-                                  Margin="3,0,0,0"
-                                  VerticalAlignment="Center">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button
-                                    Width="24"
-                                    Height="24"
-                                    Margin="5,0,0,0"
-                                    Command="{Binding Command}"
-                                    Style="{StaticResource FlatButtonStyle}"
-                                    ToolTip="{Binding ToolTip}">
-                                    <Image Source="{Binding IconFilePath}" />
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <!-- The engine buttons, grouped. The highlighted one is the engine whose page is showing. -->
+                    <Border
+                        Grid.Column="1"
+                        Margin="8,0,0,0"
+                        Padding="1,2"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource SubtleFillBrush}"
+                        CornerRadius="6">
+                        <ItemsControl Focusable="False" IsTabStop="False" ItemsSource="{Binding SearchCommands}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="1,0"
+                                        AutomationProperties.Name="{Binding ToolTip}"
+                                        Command="{Binding Command}"
+                                        Style="{StaticResource EngineButtonStyle}"
+                                        ToolTip="{Binding ToolTip}">
+                                        <Image
+                                            Width="20"
+                                            Height="20"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding IconFilePath}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
                 </Grid>
             </Border>
 

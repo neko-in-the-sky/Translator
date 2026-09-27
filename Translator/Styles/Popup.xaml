@@ -74,6 +74,57 @@
         </Setter>
     </Style>
 
+    <!-- An engine button: IconButtonStyle plus, for the engine whose page is on screen (the item's IsActive),
+         an accent tint and a short accent line at the bottom, like an open app on the Windows 11 taskbar. -->
+    <Style
+        x:Key="EngineButtonStyle"
+        BasedOn="{StaticResource IconButtonStyle}"
+        TargetType="Button">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border
+                            x:Name="Tint"
+                            Background="{DynamicResource AccentBrush}"
+                            CornerRadius="4"
+                            Opacity="0.15"
+                            Visibility="Collapsed" />
+                        <Border
+                            x:Name="Chrome"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4" />
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Rectangle
+                            x:Name="ActiveLine"
+                            Width="12"
+                            Height="3"
+                            Margin="0,0,0,1"
+                            VerticalAlignment="Bottom"
+                            Fill="{DynamicResource AccentBrush}"
+                            RadiusX="1.5"
+                            RadiusY="1.5"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                            <Setter TargetName="Tint" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="ActiveLine" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SubtleHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{StaticResource SubtlePressedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Windows 11's search box: rounded, a darker bottom edge that becomes a 2 px accent line with keyboard
          focus, a placeholder, and clear and search buttons inside. The placeholder text comes from Tag, so
          the style needs no knowledge of the app's strings. The buttons can't take focus, so clicking them

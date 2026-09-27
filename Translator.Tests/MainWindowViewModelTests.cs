@@ -60,6 +60,39 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void SearchCommands_NoneIsActiveAtFirst()
+    {
+        var viewModel = CreateViewModel("Oxford", "Oxford", "Multitran");
+
+        Assert.All(viewModel.SearchCommands, command => Assert.False(command.IsActive));
+    }
+
+    [Fact]
+    public void SearchCommand_Execute_MakesOnlyThatEngineActive()
+    {
+        var viewModel = CreateViewModel("Oxford", "Oxford", "Multitran", "Deepl");
+        viewModel.SearchCommands[0].Command.Execute(null);
+
+        viewModel.SearchCommands[1].Command.Execute(null);
+
+        Assert.Equal(
+            [false, true, false],
+            viewModel.SearchCommands.Select(command => command.IsActive));
+    }
+
+    [Fact]
+    public void DefaultSearchCommand_ExecuteFromHotkey_MakesTheDefaultEngineActive()
+    {
+        var viewModel = CreateViewModel("Multitran", "Oxford", "Multitran");
+        viewModel.SearchCommands[0].Command.Execute(null);
+
+        viewModel.DefaultSearchCommand.Command.Execute(true);
+
+        Assert.True(viewModel.DefaultSearchCommand.IsActive);
+        Assert.False(viewModel.SearchCommands[0].IsActive);
+    }
+
+    [Fact]
     public void ClearQueryCommand_EmptiesTheQueryAndNotifies()
     {
         var viewModel = CreateViewModel("Oxford", "Oxford");

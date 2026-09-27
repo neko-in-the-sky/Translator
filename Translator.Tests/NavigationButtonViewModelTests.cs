@@ -71,4 +71,23 @@ public class NavigationButtonViewModelTests
 
         Assert.True(captured!.IsFromHotkey);
     }
+
+    [Fact]
+    public void IsActive_RaisesPropertyChangedOnlyWhenItChanges()
+    {
+        var engine = new SearchEngine { Name = "Test", UrlTemplate = QueryTemplate, IconFileName = "test.ico" };
+        var button = new NavigationButtonViewModel(_ => { }, () => "word", engine);
+        var changes = 0;
+        button.PropertyChanged += (_, args) =>
+        {
+            Assert.Equal(nameof(NavigationButtonViewModel.IsActive), args.PropertyName);
+            changes++;
+        };
+
+        button.IsActive = true;
+        button.IsActive = true;
+        button.IsActive = false;
+
+        Assert.Equal(2, changes);
+    }
 }

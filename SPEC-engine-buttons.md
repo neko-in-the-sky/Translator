@@ -32,13 +32,13 @@ Make the buttons larger, group them, and highlight the one whose page is showing
 
 ## Design
 
-- `NavigationButtonViewModel` implements `INotifyPropertyChanged` and gets `IsActive`, with the
-  `SetField` pattern.
-- `MainWindowViewModel` makes a button active when its command executes. `RequestNavigation` gets
-  the button that asked, and it sets that one active and every other one inactive. The confirmation
-  page path in `TranslateFromClipboard` sets all inactive.
+- `NavigationButtonViewModel` implements `INotifyPropertyChanged` and gets `IsActive`, which
+  notifies only when it changes.
+- `MainWindowViewModel` makes a button active when its command executes. Each button's action
+  passes the button itself to `RequestNavigation`, which sets that one active and every other one
+  inactive. The confirmation page path in `TranslateFromClipboard` sets all inactive.
 - The engine `ItemsControl` keeps its horizontal `StackPanel`, wrapped in a rounded `Border` (the
-  group). `EngineButtonStyle` is based on `IconButtonStyle` and adds a trigger on
+  group). The `ItemsControl` itself isn't a tab stop, so <kbd>Tab</kbd> goes straight to the buttons. `EngineButtonStyle` is based on `IconButtonStyle` and adds a trigger on
   `IsActive` for the tint and the line.
 - `FlatButtonStyle` is removed.
 
