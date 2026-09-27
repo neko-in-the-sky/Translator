@@ -133,7 +133,7 @@ Run:   dotnet run --project Translator -c Debug
 
 ## Phase 3: Docs
 
-- [ ] **T4: Update the README**
+- [x] **T4: Update the README**
 
   **Description:** In the Usage table, change the tray row to include opening the logs folder. In
   Settings, replace "a warning in `log.txt` names it" with wording that points to the logs in
@@ -145,8 +145,8 @@ Run:   dotnet run --project Translator -c Debug
   - The README names `%LOCALAPPDATA%\Translator\Logs` and the tray item.
 
   **Verification:**
-  - [ ] `git grep -n "log.txt" README.md` finds nothing
-  - [ ] Read the rendered Markdown and check that the tray row and Settings section are accurate
+  - [x] `git grep -n "log.txt" README.md` finds nothing
+  - [x] Read the rendered Markdown and check that the tray row and Settings section are accurate
 
   **Dependencies:** T1, T3
 
