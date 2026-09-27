@@ -11,8 +11,22 @@ Press <kbd>Esc</kbd> or click away and it disappears.
 
 ## Install
 
-Download the latest `Translator-<version>-win-x64.zip` from
-[Releases](../../releases), unzip it anywhere, and run `Translator.exe`.
+Download one of these from the latest [release](../../releases):
+
+- **`Translator-<version>-win-x64-setup.exe`** (recommended) installs Translator for your user
+  account only, so it needs no administrator rights. It adds Translator to the Start menu and to
+  *Settings → Apps*. It can also add a desktop shortcut and start Translator when you sign in to
+  Windows. To update, run the setup for the new version. It closes Translator if it's running and
+  keeps your choices.
+- **`Translator-<version>-win-x64.zip`** is the portable version. Unzip it anywhere and run
+  `Translator.exe`.
+
+Both use the same [settings](#settings) and [logs](#logs), and uninstalling keeps them.
+Translator needs the Microsoft Edge WebView2 Runtime, which Windows 11 and up-to-date Windows 10
+already have. If it's missing, the setup offers to open its download page.
+
+The files aren't code-signed, so Windows SmartScreen may say it "protected your PC". Choose
+**More info → Run anyway**.
 
 ## Usage
 

@@ -37,49 +37,11 @@ jobs:
       - name: Test
         run: dotnet test Translator.sln -c Release
 
-      # Do NOT add -p:IncludeNativeLibrariesForSelfExtract=true here. It silently
-      # drops Blocklist/ads.txt from the publish output (154k ad domains), which
-      # disables ad blocking at runtime with no error. Saves 9 MB, costs a feature.
-      - name: Publish self-contained win-x64
-        run: >
-          dotnet publish Translator/Translator.csproj
-          -c Release
-          -r win-x64
-          --self-contained true
-          -p:PublishSingleFile=true
-          -p:EnableCompressionInSingleFile=true
-          -p:Version=${{ steps.v.outputs.version }}
-          -o publish
-
-      - name: Verify payload
+      # Publishes, checks the payload, and builds the zip and the installer from the same files.
+      # The PR installer job runs the same script, so this is what the PR tested.
+      - name: Build zip and installer
         shell: pwsh
-        run: |
-          # The app reads these from disk at runtime relative to AppContext.BaseDirectory.
-          # If any are missing the app still starts but silently loses blocklisting or page cleanup.
-          $required = @(
-            'Translator.exe'
-            'appsettings.json'
-            'Blocklist/ads.txt'
-            'Blocklist/my.txt'
-            'Blocklist/tracking.txt'
-            'js/oxford.js'
-            'js/free_dictionary.js'
-            'js/spanishdict.js'
-            'templates/info_template.html'
-          )
-          $missing = $required | Where-Object { -not (Test-Path "publish/$_") }
-          if ($missing) { throw "Missing from publish output: $($missing -join ', ')" }
-          Get-ChildItem publish -Recurse -File | ForEach-Object { "{0,10:N0}  {1}" -f $_.Length, $_.FullName.Replace("$PWD\publish\", '') }
-
-      - name: Package
-        id: pkg
-        shell: pwsh
-        run: |
-          Remove-Item publish/*.pdb -ErrorAction SilentlyContinue
-          $name = "Translator-${{ steps.v.outputs.version }}-win-x64.zip"
-          Compress-Archive -Path publish/* -DestinationPath $name
-          "name=$name" | Out-File -Append -Encoding utf8 $env:GITHUB_OUTPUT
-          "{0:N1} MB" -f ((Get-Item $name).Length / 1MB)
+        run: ./build/Build-Release.ps1 -Version ${{ steps.v.outputs.version }}
 
       - name: Create GitHub release
         shell: pwsh
@@ -87,6 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           gh release create "${{ steps.v.outputs.tag }}"
-          "${{ steps.pkg.outputs.name }}"
+          "artifacts/Translator-${{ steps.v.outputs.version }}-win-x64.zip"
+          "artifacts/Translator-${{ steps.v.outputs.version }}-win-x64-setup.exe"
           --title "${{ steps.v.outputs.tag }}"
           --generate-notes

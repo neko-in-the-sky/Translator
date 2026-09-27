@@ -30,3 +30,33 @@ jobs:
 
       - name: Test ${{ matrix.configuration }}
         run: dotnet test Translator.sln -c ${{ matrix.configuration }} --no-build
+
+  # Builds the release payload with the same script as release.yml and smoke-tests the installer,
+  # so installer problems show up on the PR rather than when a release is tagged.
+  installer:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build zip and installer
+        shell: pwsh
+        run: ./build/Build-Release.ps1 -Version 0.0.0
+
+      - name: Smoke-test installer
+        shell: pwsh
+        run: ./build/Test-Installer.ps1 -Setup artifacts/Translator-0.0.0-win-x64-setup.exe -LogDir artifacts/logs
+
+      - name: Upload installer and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installer
+          path: |
+            artifacts/*-setup.exe
+            artifacts/logs/
+          if-no-files-found: ignore

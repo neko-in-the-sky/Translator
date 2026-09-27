@@ -220,3 +220,8 @@ pip-log.txt
 .idea/
 .run/
 *.DotSettings.user
+
+# Release payload built by build/Build-Release.ps1
+artifacts/
+# Release scripts. The Python section above ignores every build/ folder.
+!/build/
