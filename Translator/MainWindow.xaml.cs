@@ -19,6 +19,11 @@ namespace Translator;
 /// </summary>
 public partial class MainWindow : Window
 {
+    /// <summary>
+    /// How far below its place the page is parked while loading. Any distance past the window's height works.
+    /// </summary>
+    private const double ParkedPageOffset = 10000;
+
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly BlocklistManager _blocklistManager;
     private readonly JavaScriptProvider _javaScriptProvider;
@@ -156,9 +161,14 @@ public partial class MainWindow : Window
         };
     }
 
+    /// <summary>
+    /// Parks the page below the window, where Windows clips it away, instead of hiding it. A hidden WebView2
+    /// stops drawing, and when shown again its first frame is the page it last drew: the previous entry.
+    /// A parked one keeps drawing, at the same size, so it's up to date when it comes back.
+    /// </summary>
     private void HidePage()
     {
-        WebBrowser.Visibility = Visibility.Hidden;
+        WebBrowser.Margin = new Thickness(0, ParkedPageOffset, 0, -ParkedPageOffset);
         LoadingBar.Visibility = Visibility.Visible;
     }
 
@@ -178,7 +188,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        WebBrowser.Visibility = Visibility.Visible;
+        WebBrowser.Margin = new Thickness(0);
         LoadingBar.Visibility = Visibility.Hidden;
     }
 

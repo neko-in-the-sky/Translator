@@ -35,13 +35,13 @@ and the page appears once, already cleaned up.
 ## Design
 
 ```
-NavigationStarting    → HidePage(): WebBrowser.Visibility = Hidden, loading bar shown
+NavigationStarting    → HidePage(): park the WebView2 below the window, loading bar shown
 DOMContentLoaded      → run the site script (as today), then RevealPage()
 NavigationCompleted   → RevealPage()      (fallback for failures)
 RevealPage(id)        → only for the latest navigation (the id NavigationStarting last saw),
                         because a cancelled one can complete after its replacement starts,
                         and only while the window is visible:
-                        WebBrowser.Visibility = Visible, loading bar hidden
+                        move the WebView2 back, loading bar hidden
 HideWindow()          → HidePage(), navigate to about:blank, Hide()   (as today, plus HidePage)
 ```
 
@@ -52,14 +52,24 @@ HideWindow()          → HidePage(), navigate to about:blank, Hide()   (as toda
   any sound) and frees memory. Because `RevealPage()` does nothing while the window is hidden,
   that navigation can't make the page visible again, and the next pop-up starts with it hidden.
 
-- `Hidden`, not `Collapsed`, so the layout doesn't change. The WPF WebView2 control passes its
-  visibility to `CoreWebView2Controller.IsVisible`. Navigation and scripts keep running while
-  it's hidden.
-- **Risk:** when the controller is made visible again, it might show its last frame, the previous
-  page, before repainting. If the user's check shows that, switch to the fallback. The fallback
-  keeps the WebView visible and hides the document instead: a document-created script
-  (`AddScriptToExecuteOnDocumentCreatedAsync`) adds `html { visibility: hidden }`, and
-  `RevealPage()` removes it with `ExecuteScriptAsync`.
+- **The page is parked, not hidden.** `HidePage()` moves the WebView2 below the window's client
+  area with a margin, keeping its size, and `RevealPage()` moves it back. Windows clips a child
+  window to its parent, so the parked page can't be seen.
+- **Why not `Visibility = Hidden`:** that was the first design, and the user's check showed the
+  previous entry flashing. The WPF WebView2 control passes its visibility to
+  `CoreWebView2Controller.IsVisible`, and a hidden controller stops drawing. When shown again, its
+  first frame was the last one it drew before being hidden: the old entry. A parked WebView2 stays
+  visible as far as the controller knows, so it keeps drawing the new page, and its last frame is
+  current when it moves back. The page's viewport keeps its size, so nothing is laid out again.
+- **Reopening the pop-up:** hiding the window also stops the controller drawing, so the frame it
+  keeps is the old entry. The page is parked before the window hides, so that frame is off-screen
+  when the window shows again. The controller draws the new page while parked.
+- **Why not the CSS fallback:** keeping the WebView2 visible and hiding the document with injected
+  `html { visibility: hidden }` fixes switching engines, but not reopening. The last frame before
+  the window hides would still be the old entry, unless every hide waited a few frames for the
+  hidden document to be drawn.
+- **Remaining risk:** WebView2 might pause drawing while it's entirely outside the window. The
+  user's check shows whether it does.
 - The loading bar is a `ProgressBar` with its own template, in its own 2 px grid row. Its style is
   `LoadingBarStyle` in `Popup.xaml`. The template slides an accent segment across by animating an
   opacity mask, and the animation runs only while the bar is visible.
