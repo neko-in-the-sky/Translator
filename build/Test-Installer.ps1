@@ -26,7 +26,9 @@ $ErrorActionPreference = 'Stop'
 
 $uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{27CEFC81-BB7D-4993-A1E4-D7AC625FF4BA}_is1'
 $startMenuShortcut = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Translator.lnk'
-$installDir = Join-Path $env:TEMP ('translator-smoke-' + [Guid]::NewGuid().ToString('N'))
+# Not $env:TEMP: for a long user name Windows sets it to an 8.3 short path (C:\Users\RUNNER~1\...),
+# which never equals the long paths that shortcuts and processes report.
+$installDir = Join-Path $env:LOCALAPPDATA ('Temp\translator-smoke-' + [Guid]::NewGuid().ToString('N'))
 $installedExe = Join-Path $installDir 'Translator.exe'
 $settingsDir = Join-Path $env:APPDATA 'Translator'
 $marker = Join-Path $settingsDir ('smoke-test-' + [Guid]::NewGuid().ToString('N') + '.txt')
@@ -72,7 +74,7 @@ try {
     Assert-That (Test-Path $uninstallKey) 'registered the uninstall entry'
     Assert-That (Test-Path $startMenuShortcut) 'created the Start menu shortcut'
     $target = (New-Object -ComObject WScript.Shell).CreateShortcut($startMenuShortcut).TargetPath
-    Assert-That ($target -eq $installedExe) "the Start menu shortcut points to $installedExe"
+    Assert-That ($target -eq $installedExe) "the Start menu shortcut points to $installedExe (it points to $target)"
 
     # A running Translator must not stop the uninstaller from removing its files.
     Start-Process -FilePath $installedExe | Out-Null
