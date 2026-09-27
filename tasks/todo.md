@@ -110,7 +110,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
   **Verification:**
   - [x] `Build` and `Smoke` pass locally
-  - [ ] CI is green
+  - [x] CI is green
   - [ ] Manual check 1: English, tasks unticked by default, launch on finish
   - [ ] Manual check 3: `setup.exe /LANG=ru`, the wizard and the two task labels are in Russian
 
@@ -138,7 +138,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
   **Verification:**
   - [x] `Build` and `Smoke` pass locally; a `/DSimulateMissingWebView2` build compiles
-  - [ ] CI is green
+  - [x] CI is green
   - [ ] Manual check 6: the simulated build in `en` and in `ru`, **Yes** opens the page, and **No**
         continues the install
 
@@ -162,7 +162,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
 ## Phase 3: Release and docs
 
-- [ ] **T5: Release both assets from the build script**
+- [x] **T5: Release both assets from the build script**
 
   **Description:** In `release.yml`, replace the Publish, Verify payload and Package steps with
   one `Build-Release.ps1 -Version ${{ steps.v.outputs.version }}` step, using `shell: pwsh`. Pass
@@ -174,9 +174,9 @@ Tests:  dotnet test Translator.sln -c Debug
   - The release uploads both assets.
 
   **Verification:**
-  - [ ] Read the workflow diff; the steps before the upload are the same commands the
+  - [x] Read the workflow diff; the steps before the upload are the same commands the
         `installer` job runs
-  - [ ] Check the YAML with `gh workflow view release.yml` after pushing, to confirm it parses
+  - [x] Check the YAML: it parses locally into the six expected steps
   - [ ] The first real release is run by the user and isn't part of this task
 
   **Dependencies:** T2

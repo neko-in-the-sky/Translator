@@ -61,7 +61,7 @@ Build-Release.ps1 + minimal Translator.iss (T1)
 - [ ] The installer job is green, and SPEC manual checks 1–6 pass on this machine.
 
 ### Phase 3: Release and docs
-- [ ] T5: Release both assets from the build script
+- [x] T5: Release both assets from the build script
 - [ ] T6: Document both install options in the README
 - [ ] T7: Replace SPEC.md and tasks/ with ADR 0003
 
