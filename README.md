@@ -22,7 +22,7 @@ Download the latest `Translator-<version>-win-x64.zip` from
 | <kbd>Enter</kbd> in the search box | Search with the default engine (see [Settings](#settings)) |
 | <kbd>Esc</kbd>, or clicking away | Hide the window |
 | Toolbar icons | Re-run the current query against that engine |
-| Tray icon | Translate, open the install folder, open the settings folder, or exit |
+| Tray icon | Translate, open the install, settings or logs folder, or exit |
 
 ## How it works
 
@@ -66,11 +66,17 @@ Put in only what you want to change. Anything you leave out uses the default fro
 - **A list replaces the default list.** The example above allows exactly `firefox` and `vlc`.
   `[]` allows none.
 - **Only these four settings can be changed here.** Anything else in the file, such as
-  `SearchEngines` or `Serilog`, is ignored, and a warning in `log.txt` names it. Search engines
+  `SearchEngines` or `Serilog`, is ignored, and a warning in the [log](#logs) names it. Search engines
   come with each release, together with the icons and page scripts they need.
 - **Mistakes stop startup with an error.** Malformed JSON, or an unknown `Culture`, shows an error
   when Translator starts. For JSON errors, the message names the file. Comments and trailing
   commas are fine.
+
+## Logs
+
+Translator writes its logs to `%LOCALAPPDATA%\Translator\Logs`. Right-click the tray icon and
+choose **Open logs folder** to find them. A new file starts each day, or sooner when a file reaches
+10 MB. Only the newest 10 files are kept.
 
 ## Credits
 

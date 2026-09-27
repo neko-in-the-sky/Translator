@@ -151,4 +151,7 @@
   <data name="TrayIcon_MenuItem_OpenSettingsFolder" xml:space="preserve">
     <value>Открыть папку настроек</value>
   </data>
+  <data name="TrayIcon_MenuItem_OpenLogsFolder" xml:space="preserve">
+    <value>Открыть папку логов</value>
+  </data>
 </root>

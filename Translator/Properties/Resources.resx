@@ -151,4 +151,7 @@ Click to open menu</value>
   <data name="TrayIcon_MenuItem_OpenSettingsFolder" xml:space="preserve">
     <value>Open settings folder</value>
   </data>
+  <data name="TrayIcon_MenuItem_OpenLogsFolder" xml:space="preserve">
+    <value>Open logs folder</value>
+  </data>
 </root>
