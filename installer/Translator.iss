@@ -1,4 +1,4 @@
-; Translator's installer. Build it with build/Build-Release.ps1, which passes the version and the
+﻿; Translator's installer. Build it with build/Build-Release.ps1, which passes the version and the
 ; publish folder, so that the installer and the zip contain the same files.
 
 #ifndef AppVersion
@@ -37,19 +37,45 @@ WizardStyle=modern
 CloseApplications=yes
 ; Translator doesn't register with Restart Manager. "Launch Translator" on the last page starts it.
 RestartApplications=no
+; Asks only when the Windows display language is neither English nor Russian.
+ShowLanguageDialog=auto
+
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+
+[CustomMessages]
+en.StartWithWindows=Start Translator when Windows starts
+ru.StartWithWindows=Запускать Translator при входе в Windows
+en.CloseTranslatorOnUninstall=Translator is running and will be closed so that it can be uninstalled.
+ru.CloseTranslatorOnUninstall=Translator запущен и будет закрыт, чтобы его можно было удалить.
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "startup"; Description: "{cm:StartWithWindows}"; Flags: unchecked
+
+[InstallDelete]
+; Setup doesn't remove a shortcut from an earlier install when its task is unticked on upgrade.
+Type: files; Name: "{autodesktop}\Translator.lnk"; Tasks: not desktopicon
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\Translator"; Filename: "{app}\Translator.exe"
+Name: "{autodesktop}\Translator"; Filename: "{app}\Translator.exe"; Tasks: desktopicon
+
+[Registry]
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Translator"; ValueData: """{app}\Translator.exe"""; Tasks: startup; Flags: uninsdeletevalue
+; Likewise for the startup entry: unticking the task on upgrade removes the earlier value.
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: none; ValueName: "Translator"; Tasks: not startup; Flags: deletevalue
+
+[Run]
+Filename: "{app}\Translator.exe"; Description: "{cm:LaunchProgram,Translator}"; Flags: nowait postinstall skipifsilent
 
 [UninstallDelete]
 ; The app creates WebView2's data folder, not Setup, so the uninstaller would otherwise leave it behind.
 Type: filesandordirs; Name: "{app}\Translator.exe.WebView2"
-
-[CustomMessages]
-CloseTranslatorOnUninstall=Translator is running and will be closed so that it can be uninstalled.
 
 [Code]
 // Setup closes a running Translator through Restart Manager, but the uninstaller doesn't: it would

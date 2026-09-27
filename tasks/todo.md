@@ -93,7 +93,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
 ## Phase 2: Installer features
 
-- [ ] **T3: Add the shortcut, startup and launch options, and Russian**
+- [x] **T3: Add the shortcut, startup and launch options, and Russian**
 
   **Description:** Add `[Languages]` with `en` and `ru`, with `ShowLanguageDialog=auto`. Add
   `[CustomMessages]` for the two task labels in both languages. Add `[Tasks]` `desktopicon` and
@@ -109,7 +109,7 @@ Tests:  dotnet test Translator.sln -c Debug
   - Every label in the installer comes from `.isl` files or `[CustomMessages]`. None is hard-coded.
 
   **Verification:**
-  - [ ] `Build` and `Smoke` pass locally, and CI is green
+  - [x] `Build` and `Smoke` pass locally, and CI is green
   - [ ] Manual check 1: English, tasks unticked by default, launch on finish
   - [ ] Manual check 3: `setup.exe /LANG=ru`, the wizard and the two task labels are in Russian
 

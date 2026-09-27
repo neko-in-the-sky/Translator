@@ -54,7 +54,7 @@ Build-Release.ps1 + minimal Translator.iss (T1)
 - [ ] The installer job is green on a PR, and a local install and uninstall work without UAC.
 
 ### Phase 2: Installer features
-- [ ] T3: Add the shortcut, startup and launch options, and Russian
+- [x] T3: Add the shortcut, startup and launch options, and Russian
 - [ ] T4: Warn when the WebView2 Runtime is missing
 
 ### Checkpoint B
