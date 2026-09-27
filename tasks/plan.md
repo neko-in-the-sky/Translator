@@ -47,7 +47,7 @@ Build-Release.ps1 + minimal Translator.iss (T1)
 ## Task List
 
 ### Phase 1: Minimal installer, tested in CI
-- [ ] T1: Build the zip and a minimal per-user installer from one script
+- [x] T1: Build the zip and a minimal per-user installer from one script
 - [ ] T2: Smoke-test the installer on every PR
 
 ### Checkpoint A

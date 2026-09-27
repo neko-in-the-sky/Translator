@@ -28,6 +28,9 @@ as the zip. The zip stays exactly as it is.
 6. Translator appears in *Settings → Apps*. Uninstalling removes the program files, the shortcuts,
    the startup entry and the WebView2 data folder inside the install folder. It keeps
    `%APPDATA%\Translator` (settings) and `%LOCALAPPDATA%\Translator` (logs).
+   If Translator is running from the install folder, the uninstaller first says it will close it
+   (OK/Cancel) and then ends it. A silent uninstall ends it without asking. A copy running from
+   anywhere else, such as an unzipped folder, is left alone.
 7. The installer is in English and Russian, chosen from the Windows display language.
 8. A CI job builds the installer on every PR and smoke-tests it: silent install, check the files,
    silent uninstall, check that everything is gone. Installer problems are caught before a
@@ -276,3 +279,10 @@ There are no unit tests for the `.iss` file. It is covered by:
 1. Inno Setup 6 is installed on this machine with `winget install --id JRSoftware.InnoSetup -e`,
    which is 6.7.3. CI uses the runner's preinstalled 6.7.1.
 2. The publisher shown in *Settings → Apps* is **Neko in the Sky**.
+3. **The uninstaller closes a running Translator itself.** Found during T1: Setup closes a running
+   Translator through Restart Manager, which the setup log confirms, but Inno's uninstaller
+   doesn't. It left the files locked and the app running, yet still removed the uninstall entry.
+   `InitializeUninstall` looks up `Translator.exe` processes whose path is `{app}\Translator.exe`
+   with WMI, and ends them. That's safe because the app keeps no unsaved state. The rejected
+   alternative was an `AppMutex`, which changes the app's code and makes the user exit the app
+   by hand.

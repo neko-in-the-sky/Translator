@@ -15,7 +15,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
 ## Phase 1: Minimal installer, tested in CI
 
-- [ ] **T1: Build the zip and a minimal per-user installer from one script**
+- [x] **T1: Build the zip and a minimal per-user installer from one script**
 
   **Description:** Add `build/Build-Release.ps1`. It takes the publish flags and the
   required-file list from `release.yml`, including the `IncludeNativeLibrariesForSelfExtract`
@@ -40,10 +40,9 @@ Tests:  dotnet test Translator.sln -c Debug
   - The script runs on Windows PowerShell 5.1.
 
   **Verification:**
-  - [ ] `Build` succeeds locally
-  - [ ] Zip comparison: `gh release download --pattern '*.zip'` from the latest release, then
-        compare the sorted entry names
-  - [ ] Manual: install interactively. There is no UAC prompt, it installs to
+  - [x] `Build` succeeds locally
+  - [x] Zip comparison: `gh release download --pattern '*.zip'` from the latest release, then
+        compare the sorted entry names. The only difference is that the old zip has a`n        directory-only entry `runtimes/win-x64/`, which doesn't affect extraction`n  - [x] Install, launch from the Start menu shortcut, upgrade and uninstall, all done silently.`n        The wizard itself is covered in Checkpoint B. Uninstalling while Translator runs closes`n        only the installed copy (SPEC → Decisions #3)`n  - [ ] Manual: install interactively. There is no UAC prompt, it installs to
         `%LOCALAPPDATA%\Programs\Translator`, the Start menu shortcut starts Translator, and the
         pop-up shows a page. Uninstall from *Settings → Apps*: the folder, including
         `Translator.exe.WebView2`, and the shortcut are gone
