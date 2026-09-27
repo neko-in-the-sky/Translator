@@ -20,6 +20,15 @@
     d:DataContext="{d:DesignInstance Type=translator:MainWindowViewModel, IsDesignTimeCreatable=False}"
     mc:Ignorable="d">
 
+    <!-- Extending the glass frame, even by a pixel, is what makes the Desktop Window Manager draw its shadow. -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CaptionHeight="0"
+            GlassFrameThickness="1"
+            ResizeBorderThickness="0"
+            UseAeroCaptionButtons="False" />
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
         <Style
             x:Key="FlatButtonStyle"
@@ -27,7 +36,8 @@
             TargetType="Button" />
     </Window.Resources>
 
-    <Border BorderBrush="Black" BorderThickness="1">
+    <!-- Where Windows rounds the corners it also draws a thin border, and this one is removed. -->
+    <Border Name="WindowBorder" BorderBrush="Black" BorderThickness="1">
 
         <Grid Margin="5">
             <Grid.RowDefinitions>
