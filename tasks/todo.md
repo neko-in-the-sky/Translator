@@ -186,7 +186,7 @@ Tests:  dotnet test Translator.sln -c Debug
 
   **Estimated scope:** XS
 
-- [ ] **T6: Document both install options in the README**
+- [x] **T6: Document both install options in the README**
 
   **Description:** Rewrite the Install section:
   - the installer is recommended, installs per-user with no admin rights, and offers the two
@@ -201,7 +201,7 @@ Tests:  dotnet test Translator.sln -c Debug
     installer's actual behaviour from Checkpoint B.
 
   **Verification:**
-  - [ ] Read the rendered README
+  - [x] Read the rendered README
 
   **Dependencies:** T4
 

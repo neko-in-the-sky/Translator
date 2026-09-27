@@ -62,7 +62,7 @@ Build-Release.ps1 + minimal Translator.iss (T1)
 
 ### Phase 3: Release and docs
 - [x] T5: Release both assets from the build script
-- [ ] T6: Document both install options in the README
+- [x] T6: Document both install options in the README
 - [ ] T7: Replace SPEC.md and tasks/ with ADR 0003
 
 ### Checkpoint C
