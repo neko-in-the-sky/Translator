@@ -66,9 +66,7 @@
             <!-- The toolbar, with a divider under it. The page below runs to the window's edges. -->
             <Border
                 Grid.Row="0"
-                Padding="12,12,12,10"
-                BorderBrush="{StaticResource DividerBrush}"
-                BorderThickness="0,0,0,1">
+                Padding="12,12,12,10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
