@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using Hardcodet.Wpf.TaskbarNotification.Interop;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -46,6 +47,17 @@ public partial class MainWindow : Window
 
         InitializeComponent();
         InitializeWebView2();
+
+        // Stored in the window's own resources, which take precedence over Popup.xaml's fallback.
+        var accentColor = AccentColor.TryGet();
+        if (accentColor != null)
+        {
+            Resources["AccentBrush"] = new SolidColorBrush(accentColor.Value);
+        }
+        else
+        {
+            _logger.LogWarning("Unable to read the Windows accent colour; using the default blue");
+        }
 
         DataContext = _mainWindowViewModel;
 

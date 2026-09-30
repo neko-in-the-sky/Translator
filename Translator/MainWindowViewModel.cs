@@ -34,6 +34,7 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         _notificationStateChecker = notificationStateChecker;
         _pageBuilder = pageBuilder;
         _logger = logger;
+        ClearQueryCommand = new RelayCommand(() => QueryText = string.Empty);
 
         var settings = applicationSettings.Value;
         if (settings.SearchEngines is not { Length: > 0 })
@@ -45,7 +46,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         SearchCommands = new();
         foreach (var searchEngine in settings.SearchEngines)
         {
-            var command = new NavigationButtonViewModel(RequestNavigation, () => QueryText, searchEngine);
+            NavigationButtonViewModel command = null;
+            command = new NavigationButtonViewModel(args => RequestNavigation(command, args), () => QueryText,
+                searchEngine);
             SearchCommands.Add(command);
             if (searchEngine.Name == settings.UserSettings.DefaultSearchEngine)
             {
@@ -74,6 +77,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         set => SetField(ref _queryText, value);
     }
 
+    public ICommand ClearQueryCommand { get; }
+
     public event Action<NavigationRequestedEventArgs> NavigationRequested;
 
     public void TranslateFromClipboard(bool fromHotKey)
@@ -98,6 +103,8 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         }
         else
         {
+            // No engine's page is showing, so none is highlighted.
+            SetActiveSearchCommand(null);
             var page = _pageBuilder.MakeInfoPage(Resources.Notification_SuspiciousText);
             NavigationRequested?.Invoke(new NavigationRequestedEventArgs
             {
@@ -132,8 +139,19 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
         return null;
     }
 
-    private void RequestNavigation(NavigationRequestedEventArgs args)
-        => NavigationRequested?.Invoke(args);
+    private void RequestNavigation(NavigationButtonViewModel source, NavigationRequestedEventArgs args)
+    {
+        SetActiveSearchCommand(source);
+        NavigationRequested?.Invoke(args);
+    }
+
+    private void SetActiveSearchCommand(NavigationButtonViewModel active)
+    {
+        foreach (var command in SearchCommands)
+        {
+            command.IsActive = command == active;
+        }
+    }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -170,12 +188,13 @@ public class NavigationRequestedEventArgs : EventArgs
     public bool IsFromHotkey { get; init; }
 }
 
-public class NavigationButtonViewModel
+public class NavigationButtonViewModel : INotifyPropertyChanged
 {
     private readonly Action<NavigationRequestedEventArgs> _action;
     private readonly Func<string> _query;
     private readonly SearchEngine _searchEngine;
     private readonly Regex _autoSearchRegex;
+    private bool _isActive;
 
     public NavigationButtonViewModel(Action<NavigationRequestedEventArgs> action, Func<string> query,
         SearchEngine searchEngine)
@@ -197,6 +216,23 @@ public class NavigationButtonViewModel
     public string IconFilePath { get; }
 
     public string ToolTip => _searchEngine.Name;
+
+    /// <summary>
+    /// Whether this engine's page is the one on screen.
+    /// </summary>
+    public bool IsActive
+    {
+        get => _isActive;
+        set
+        {
+            if (_isActive == value)
+                return;
+            _isActive = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsActive)));
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 
     public bool CanAutoSearch(string query) => _autoSearchRegex != null && _autoSearchRegex.IsMatch(query);
 

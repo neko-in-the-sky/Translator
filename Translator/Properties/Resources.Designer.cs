@@ -106,6 +106,15 @@ namespace Translator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Word or phrase.
+        /// </summary>
+        public static string QueryTextBox_Placeholder {
+            get {
+                return ResourceManager.GetString("QueryTextBox_Placeholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A word or an expression to translate.
         /// </summary>
         public static string QueryTextBox_Tooltip {

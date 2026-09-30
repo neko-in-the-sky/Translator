@@ -30,16 +30,17 @@
     </WindowChrome.WindowChrome>
 
     <Window.Resources>
-        <Style
-            x:Key="FlatButtonStyle"
-            BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-            TargetType="Button" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/Popup.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <!-- Where Windows rounds the corners it also draws a thin border, and this one is removed. -->
     <Border Name="WindowBorder" BorderBrush="Black" BorderThickness="1">
 
-        <Grid Margin="5">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -62,53 +63,62 @@
                 </tb:TaskbarIcon.ContextMenu>
             </tb:TaskbarIcon>
 
-            <Grid
+            <!-- The toolbar, with a divider under it. The page below runs to the window's edges. -->
+            <Border
                 Grid.Row="0"
-                Margin="0,10,20,0"
-                HorizontalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox
-                    Name="QueryTextBox"
-                    Text="{Binding Path=QueryText, UpdateSourceTrigger=PropertyChanged}"
-                    Grid.Column="0"
-                    Height="25"
-                    VerticalContentAlignment="Center"
-                    FontSize="14"
-                    ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}"
-                    KeyDown="QueryTextBox_KeyDown" />
-                
-                <ItemsControl ItemsSource="{Binding SearchCommands}"
-                              Grid.Column="1">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button
-                                Width="24"
-                                Height="24"
-                                Margin="5,0,0,0"
-                                Command="{Binding Command}"
-                                Style="{StaticResource FlatButtonStyle}"
-                                ToolTip="{Binding ToolTip}">
-                                <Image Source="{Binding IconFilePath}" />
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
+                Padding="12,12,12,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox
+                        Name="QueryTextBox"
+                        Grid.Column="0"
+                        KeyDown="QueryTextBox_KeyDown"
+                        Style="{StaticResource SearchBoxStyle}"
+                        Tag="{x:Static p:Resources.QueryTextBox_Placeholder}"
+                        Text="{Binding Path=QueryText, UpdateSourceTrigger=PropertyChanged}"
+                        ToolTip="{x:Static p:Resources.QueryTextBox_Tooltip}" />
+
+                    <!-- The engine buttons, grouped. The highlighted one is the engine whose page is showing. -->
+                    <Border
+                        Grid.Column="1"
+                        Margin="8,0,0,0"
+                        Padding="1,2"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource SubtleFillBrush}"
+                        CornerRadius="6">
+                        <ItemsControl Focusable="False" IsTabStop="False" ItemsSource="{Binding SearchCommands}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="1,0"
+                                        AutomationProperties.Name="{Binding ToolTip}"
+                                        Command="{Binding Command}"
+                                        Style="{StaticResource EngineButtonStyle}"
+                                        ToolTip="{Binding ToolTip}">
+                                        <Image
+                                            Width="20"
+                                            Height="20"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding IconFilePath}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </Grid>
+            </Border>
 
             <wpf:WebView2
                 Name="WebBrowser"
                 Grid.Row="1"
-                Margin="0,10,0,0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
