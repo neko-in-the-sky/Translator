@@ -86,9 +86,7 @@ $required = @(
     'Blocklist/ads.txt'
     'Blocklist/my.txt'
     'Blocklist/tracking.txt'
-    'js/oxford.js'
-    'js/free_dictionary.js'
-    'js/spanishdict.js'
+    'js/page_filter.js'
     'templates/info_template.html'
 )
 $missing = @($required | Where-Object { -not (Test-Path (Join-Path $publish $_)) })

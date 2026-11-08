@@ -105,7 +105,7 @@ Set-Content -Path $marker -Value 'Written by the installer smoke test'
 
 try {
     Install-Translator 'desktopicon,startup' 'translator-setup-1.log'
-    foreach ($file in @('Translator.exe', 'appsettings.json', 'Blocklist\ads.txt', 'js\oxford.js', 'templates\info_template.html')) {
+    foreach ($file in @('Translator.exe', 'appsettings.json', 'Blocklist\ads.txt', 'js\page_filter.js', 'templates\info_template.html')) {
         Assert-That (Test-Path (Join-Path $installDir $file)) "installed $file"
     }
     Assert-That (Test-Path $uninstallKey) 'registered the uninstall entry'

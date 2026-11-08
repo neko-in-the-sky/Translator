@@ -1,1 +1,0 @@
-document.getElementById("sidebar-container-video").remove();

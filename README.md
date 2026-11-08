@@ -44,13 +44,19 @@ The files aren't code-signed, so Windows SmartScreen may say it "protected your 
 2. On press, the clipboard is read.
 3. If a full-screen application is in the foreground, the pop-up is suppressed unless that
    application is allow-listed — so it stays out of the way during games and presentations.
-4. The text is formatted into the default engine's URL and loaded in an embedded WebView2 control.
-5. Ad and tracker requests are blocked, and a per-site script strips the page's own chrome so the
-   pop-up shows the entry and little else.
+4. The text is formatted into the current engine's URL and loaded in an embedded WebView2 control.
+   The current engine is the one you last clicked, remembered across restarts in
+   `%LOCALAPPDATA%\Translator\state.json`. Until you click one, it's `DefaultSearchEngine`.
+5. Ad and tracker requests are blocked, and each engine's CSS selectors hide the site's own header,
+   search bar and ad slots before the page is drawn, so the pop-up shows the entry and little else.
+   A selector that stops matching, because the site has changed, is logged as a warning.
 
-If the copied text does not match the default engine's `AutoSearchRegex`, nothing is searched
+If the copied text does not match the current engine's `AutoSearchRegex`, nothing is searched
 automatically — a confirmation page appears instead, so a stray clipboard full of text never
-turns into a web request on its own.
+turns into a web request on its own. The dictionaries accept a word or a short phrase, and Google
+Translate a single line of up to 200 characters that looks like language: no letters touching
+digits, and none of `# % & * / \ @ _ [ ] { }` or symbols such as `$`. So a copied password, link or
+email address always gets the confirmation page, unless it's made of letters only.
 
 ## Settings
 
@@ -72,7 +78,7 @@ Put in only what you want to change. Anything you leave out uses the default fro
 
 | Setting | What it does |
 |---|---|
-| `DefaultSearchEngine` | Engine used by the hotkey and by <kbd>Enter</kbd>. Must match an engine's `Name`, or the first engine is used |
+| `DefaultSearchEngine` | Engine used by the hotkey and by <kbd>Enter</kbd> until you click another one, which is then remembered instead. Must match an engine's `Name`, or the first engine is used |
 | `Culture` | UI language: `en-US` or `ru-RU` |
 | `AllowedFullscreenApps` | Full-screen apps the pop-up may still appear over. An entry matches any process whose name contains it, ignoring case |
 | `Popup` | `DefaultWidth`, `DefaultHeight` and `VerticalOffsetFromCursor`, in pixels. Set any subset |

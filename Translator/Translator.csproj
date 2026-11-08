@@ -30,13 +30,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="js\oxford.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="js\free_dictionary.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-     <None Update="js\spanishdict.js">
+    <None Update="js\page_filter.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -58,16 +52,18 @@
     <Resource Include="icons\multitran.ico" />
     <None Remove="icons\oxford.ico" />
     <Resource Include="icons\oxford.ico" />
-    <None Remove="icons\deepl.ico" />
-    <Resource Include="icons\deepl.ico" />
+    <None Remove="icons\google_translate.ico" />
+    <Resource Include="icons\google_translate.ico" />
     <None Remove="icons\urban_dictionary.ico" />
     <Resource Include="icons\urban_dictionary.ico" />
     <None Remove="icons\stack-of-books.ico" />
     <Resource Include="icons\stack-of-books.ico" />
     <None Remove="icons\free_dictionary.ico" />
     <Resource Include="icons\free_dictionary.ico" />
-    <None Remove="icons\spanishdict.ico" />
-    <Resource Include="icons\spanishdict.ico" />
+    <None Remove="icons\spain_flag.ico" />
+    <Resource Include="icons\spain_flag.ico" />
+    <None Remove="icons\uk_flag.ico" />
+    <Resource Include="icons\uk_flag.ico" />
   </ItemGroup>
 
   <ItemGroup>
