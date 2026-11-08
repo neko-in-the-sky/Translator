@@ -18,7 +18,7 @@ public class PageFilterScriptTests
         JsonDocument.Parse(new PageFilterScript(engines, PageFilterScript.FiltersPlaceholder).Text).RootElement;
 
     [Fact]
-    public void Text_EngineWithSelectors_IsKeyedByDomain()
+    public void Text_EngineWithSelectors_IsKeyedByHostWithoutWww()
     {
         var filters = Filters(Engine("Oxford", "https://www.oxfordlearnersdictionaries.com/search/english/?q={0}",
             "#ox-header", "#searchbar"));
@@ -26,6 +26,28 @@ public class PageFilterScriptTests
         var filter = filters.GetProperty("oxfordlearnersdictionaries.com");
         Assert.Equal("Oxford", filter.GetProperty("engine").GetString());
         Assert.Equal(["#ox-header", "#searchbar"],
+            filter.GetProperty("hide").EnumerateArray().Select(selector => selector.GetString()));
+    }
+
+    [Fact]
+    public void Text_SubdomainOtherThanWww_IsKept()
+    {
+        // Keyed by "google.com", the filter would also run on consent.google.com.
+        var filters = Filters(Engine("Google Translate", "https://translate.google.com/?text={0}", "nav"));
+
+        Assert.Equal(["translate.google.com"], filters.EnumerateObject().Select(filter => filter.Name));
+    }
+
+    [Fact]
+    public void Text_EnginesOnTheSameHost_ShareOneFilter()
+    {
+        var filters = Filters(
+            Engine("Wiktionary English", "https://en.wiktionary.org/wiki/{0}#English", "#catlinks", ".a"),
+            Engine("Wiktionary German", "https://en.wiktionary.org/wiki/{0}#German", "#catlinks", ".b"));
+
+        var filter = Assert.Single(filters.EnumerateObject()).Value;
+        Assert.Equal("Wiktionary English, Wiktionary German", filter.GetProperty("engine").GetString());
+        Assert.Equal(["#catlinks", ".a", ".b"],
             filter.GetProperty("hide").EnumerateArray().Select(selector => selector.GetString()));
     }
 

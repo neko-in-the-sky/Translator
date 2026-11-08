@@ -95,13 +95,19 @@ because in its narrow layout the search form sits directly in the column that ho
 | Urban Dictionary | `#ud-root > div:has(> div > [class~="leaderboard:block"])`, `.udh`, `#definitions-feed > section`, `.ad-panel`, `.definition div:has(> a[href*="/go/store/"])`, `footer.udf` | The top ad band reserves 114 px. `[class~=…]` matches the Tailwind class `leaderboard:block` without escaping its colon. The merchandise box is the feed's only `section` |
 | Wiktionary German | `.vector-header-container`, `.vector-sticky-header`, `.vector-page-toolbar`, `#p-lang-btn`, `#catlinks`, `.mw-footer-container`, `.interproject-box` | Classes of MediaWiki's Vector 2022 skin. `.interproject-box`, the links to other Wikimedia projects, was added during the by-hand check. The other languages' sections stay: they're flat siblings of the German one with no container to hide, and the URL's `#German` scrolls to it |
 
+SpanishDict and DeepL were later replaced by Wiktionary Spanish and Google Translate, and
+Wiktionary English was added. `SPEC-engines.md` has their selectors and why filters became keyed
+by host instead of by domain.
+
 ### The script
 
 One static file, `Translator/js/page_filter.js`, replaces the three site scripts. Its code sits
 inside a function, so none of its names can clash with names the page declares. At startup a new
 `PageFilterScript` class reads it and replaces the placeholder `/* filters */ {}` with the
-selectors as JSON. They're keyed by each engine's domain (`WebHelpers.GetDomain`) and serialised
-with `System.Text.Json`, so quotes in selectors stay valid:
+selectors as JSON. They're keyed by each engine's host without a leading `www.`
+(`WebHelpers.GetHost`), and engines on the same host share one filter, with their selectors
+merged and their names joined. They're serialised with `System.Text.Json`, so quotes in
+selectors stay valid:
 
 ```js
 const filters = {"oxfordlearnersdictionaries.com": {"engine": "Oxford", "hide": ["#ox-header", ...]}, ...};
@@ -113,7 +119,7 @@ finish before the first navigation, so `NavigateToUrl` awaits it.
 
 In the page, the script:
 
-1. Returns at once unless it's in the top frame and `location.hostname` is a filter's domain or a
+1. Returns at once unless it's in the top frame and `location.hostname` is a filter's host or a
    subdomain of it.
 2. Checks each selector with `document.createDocumentFragment().querySelector(selector)`, which
    throws on invalid CSS. An invalid selector is reported and skipped.
@@ -172,7 +178,7 @@ Changed:
 ## Testing
 
 - **Automated (xUnit, `PageFilterScriptTests`):**
-  - Engines with a `Hide` list appear in the JSON under their domain. Engines without one, or with
+  - Engines with a `Hide` list appear in the JSON under their host. Engines without one, or with
     an empty one, don't.
   - Selectors containing quotes and backslashes survive as valid JSON inside the script.
   - The shipped `page_filter.js` has the placeholder exactly once.

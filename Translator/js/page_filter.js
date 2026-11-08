@@ -2,7 +2,7 @@
 // MainWindow registers this script to run in every new document before the page's own scripts.
 // Everything sits inside a function, so nothing here can clash with names the page declares.
 (() => {
-    // PageFilterScript replaces the placeholder below with the filters, keyed by domain:
+    // PageFilterScript replaces the placeholder below with the filters, keyed by host without "www.":
     // {"oxfordlearnersdictionaries.com": {"engine": "Oxford", "hide": ["#ox-header", ...]}, ...}
     const filters = /* filters */ {};
 

@@ -4,13 +4,13 @@ namespace Translator;
 
 public static class WebHelpers
 {
-    public static string GetDomain(Uri uri)
+    /// <summary>
+    /// The host without a leading "www.", so that "www.example.com" and "example.com" give the same
+    /// key, while other subdomains, such as "translate.google.com", are kept apart from "consent.google.com".
+    /// </summary>
+    public static string GetHost(Uri uri)
     {
-        var host = uri.Host;
-        var hostParts = host.Split('.');
-        var domain = hostParts.Length > 2
-            ? string.Join('.', hostParts[^2], hostParts[^1])
-            : host;
-        return domain;
+        var host = uri.Host.ToLowerInvariant();
+        return host.StartsWith("www.", StringComparison.Ordinal) ? host[4..] : host;
     }
 }
