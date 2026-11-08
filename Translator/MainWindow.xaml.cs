@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -21,19 +22,26 @@ public partial class MainWindow : Window
 {
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly BlocklistManager _blocklistManager;
-    private readonly JavaScriptProvider _javaScriptProvider;
+    private readonly PageFilterScript _pageFilterScript;
+    private readonly PageFilterReports _pageFilterReports;
     private readonly ILogger<MainWindow> _logger;
     private readonly PopupSizeLocationProvider _popupSizeLocationProvider;
     private readonly IConfiguration _configuration;
 
+    // Completed once the page filter is registered, or has failed to be, so that no navigation
+    // starts before it applies.
+    private readonly TaskCompletionSource _pageFilterRegistered = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     public MainWindow(MainWindowViewModel mainWindowViewModel, PopupSizeLocationProvider popupSizeLocationProvider,
-        BlocklistManager blocklistManager, JavaScriptProvider javaScriptProvider, IConfiguration configuration,
+        BlocklistManager blocklistManager, PageFilterScript pageFilterScript, PageFilterReports pageFilterReports,
+        IConfiguration configuration,
         ILogger<MainWindow> logger)
     {
         _mainWindowViewModel = mainWindowViewModel;
         _popupSizeLocationProvider = popupSizeLocationProvider;
         _blocklistManager = blocklistManager;
-        _javaScriptProvider = javaScriptProvider;
+        _pageFilterScript = pageFilterScript;
+        _pageFilterReports = pageFilterReports;
         _configuration = configuration;
         _logger = logger;
 
@@ -104,11 +112,12 @@ public partial class MainWindow : Window
 
     private void InitializeWebView2()
     {
-        WebBrowser.CoreWebView2InitializationCompleted += (_, initializationCompletedArgs) =>
+        WebBrowser.CoreWebView2InitializationCompleted += async (_, initializationCompletedArgs) =>
         {
             if (!initializationCompletedArgs.IsSuccess)
             {
                 _logger.LogError("CoreWebView2 initialization failed.");
+                _pageFilterRegistered.TrySetResult();
                 return;
             }
 
@@ -126,14 +135,23 @@ public partial class MainWindow : Window
                 }
             };
 
-            WebBrowser.CoreWebView2.DOMContentLoaded += async (_, _) =>
+            WebBrowser.CoreWebView2.WebMessageReceived += (_, webMessageReceivedArgs) =>
             {
-                var js = _javaScriptProvider.GetPostProcessingJavaScript(WebBrowser.Source.AbsoluteUri);
-                if (js != null)
-                {
-                    await WebBrowser.ExecuteScriptAsync(js);
-                }
+                _pageFilterReports.Handle(webMessageReceivedArgs.WebMessageAsJson, webMessageReceivedArgs.Source);
             };
+
+            try
+            {
+                await WebBrowser.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(_pageFilterScript.Text);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to register the page filter; pages will show unfiltered");
+            }
+            finally
+            {
+                _pageFilterRegistered.TrySetResult();
+            }
         };
     }
 
@@ -172,6 +190,7 @@ public partial class MainWindow : Window
             try
             {
                 await WebBrowser.EnsureCoreWebView2Async();
+                await _pageFilterRegistered.Task;
                 WebBrowser.CoreWebView2.Settings.IsScriptEnabled = true;
                 _logger.LogInformation("Navigating to {Url}", url);
                 WebBrowser.CoreWebView2.Navigate(url);

@@ -30,13 +30,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="js\oxford.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="js\free_dictionary.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-     <None Update="js\spanishdict.js">
+    <None Update="js\page_filter.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -8,7 +8,10 @@ public class SearchEngine
     
     public string IconFileName { get; set; }
     
-    public string JsFileName { get; set; }
+    /// <summary>
+    /// CSS selectors for the parts of the engine's pages to hide, such as the site's header and ad slots.
+    /// </summary>
+    public string[] Hide { get; set; }
     
     public string AutoSearchRegex { get; set; }
 }

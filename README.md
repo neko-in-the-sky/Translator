@@ -45,8 +45,9 @@ The files aren't code-signed, so Windows SmartScreen may say it "protected your 
 3. If a full-screen application is in the foreground, the pop-up is suppressed unless that
    application is allow-listed — so it stays out of the way during games and presentations.
 4. The text is formatted into the default engine's URL and loaded in an embedded WebView2 control.
-5. Ad and tracker requests are blocked, and a per-site script strips the page's own chrome so the
-   pop-up shows the entry and little else.
+5. Ad and tracker requests are blocked, and each engine's CSS selectors hide the site's own header,
+   search bar and ad slots before the page is drawn, so the pop-up shows the entry and little else.
+   A selector that stops matching, because the site has changed, is logged as a warning.
 
 If the copied text does not match the default engine's `AutoSearchRegex`, nothing is searched
 automatically — a confirmation page appears instead, so a stray clipboard full of text never
