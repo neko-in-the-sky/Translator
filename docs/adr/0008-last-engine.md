@@ -33,8 +33,7 @@ into a web request on its own.
 
    | Engine | Pattern | Searches at once for |
    |---|---|---|
-   | Oxford | `^[a-zA-Z]+$` | one English word |
-   | Free Dictionary, Multitran, Urban Dictionary, Wiktionary English | `^[a-zA-Z]+(?:[-'’ ][a-zA-Z]+){0,3}$` | an English word or a phrase of up to four words, with straight or curly apostrophes |
+   | Oxford, Free Dictionary, Multitran, Urban Dictionary, Wiktionary English | `^[a-zA-Z]+(?:[-'’ ][a-zA-Z]+){0,3}$` | an English word or a phrase of up to four words, with straight or curly apostrophes. Oxford's was one word only (`^[a-zA-Z]+$`) |
    | Wiktionary Spanish, Wiktionary German | `^\p{L}+(?:[-'’ ]\p{L}+){0,3}$` | the same, with any letters |
    | Google Translate | `^(?!.*(?:[\p{L}\p{M}]\p{P}*\p{N}\|\p{N}\p{P}*\p{L}))[\p{L}\p{M}\p{N}\p{P} -[#%&*/\\@_\[\]{}]]{1,200}$` | one line of up to 200 characters that looks like language |
 

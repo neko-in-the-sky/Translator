@@ -31,6 +31,7 @@ public class AutoSearchRegexTests
 
     [Theory]
     [InlineData("Oxford", "house")]
+    [InlineData("Oxford", "give up")]
     [InlineData("Free Dictionary", "house")]
     [InlineData("Free Dictionary", "give up")]
     [InlineData("Free Dictionary", "mother-in-law")]
@@ -61,7 +62,6 @@ public class AutoSearchRegexTests
     }
 
     [Theory]
-    [InlineData("Oxford", "give up")]                                   // one word only, as before
     [InlineData("Free Dictionary", "niño")]                             // English letters only
     [InlineData("Free Dictionary", "one two three four five")]          // more than four words
     [InlineData("Wiktionary German", "Das Haus ist groß.")]             // punctuation: a sentence
