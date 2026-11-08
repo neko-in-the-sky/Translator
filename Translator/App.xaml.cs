@@ -32,6 +32,7 @@ namespace Translator
                 builder.Services
                     .AddSingleton<HotkeyManager>()
                     .AddSingleton<PageBuilder>()
+                    .AddSingleton<AppState>()
                     .AddSingleton<NotificationStateChecker>()
                     .AddSingleton<BlocklistManager>()
                     .AddSingleton<PageFilterScript>()

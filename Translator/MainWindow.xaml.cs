@@ -294,7 +294,7 @@ public partial class MainWindow : Window
     {
         if (e.Key == Key.Enter)
         {
-            _mainWindowViewModel.DefaultSearchCommand.Command.Execute(null);
+            _mainWindowViewModel.CurrentSearchCommand.Command.Execute(null);
         }
     }
 }

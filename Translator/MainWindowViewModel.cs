@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -24,15 +25,19 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     private readonly HotkeyManager _hotkeyManager;
     private readonly NotificationStateChecker _notificationStateChecker;
     private readonly PageBuilder _pageBuilder;
+    private readonly AppState _appState;
     private readonly ILogger<MainWindowViewModel> _logger;
     private string _queryText;
+    private NavigationButtonViewModel _currentSearchCommand;
 
     public MainWindowViewModel(HotkeyManager hotkeyManager, NotificationStateChecker notificationStateChecker,
-        PageBuilder pageBuilder, IOptions<ApplicationSettings> applicationSettings, ILogger<MainWindowViewModel> logger)
+        PageBuilder pageBuilder, AppState appState, IOptions<ApplicationSettings> applicationSettings,
+        ILogger<MainWindowViewModel> logger)
     {
         _hotkeyManager = hotkeyManager;
         _notificationStateChecker = notificationStateChecker;
         _pageBuilder = pageBuilder;
+        _appState = appState;
         _logger = logger;
         ClearQueryCommand = new RelayCommand(() => QueryText = string.Empty);
 
@@ -50,20 +55,28 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
             command = new NavigationButtonViewModel(args => RequestNavigation(command, args), () => QueryText,
                 searchEngine);
             SearchCommands.Add(command);
-            if (searchEngine.Name == settings.UserSettings.DefaultSearchEngine)
-            {
-                DefaultSearchCommand = command;
-            }
         }
 
-        if (DefaultSearchCommand == null)
+        // The engine last picked, then the configured default, then the first engine.
+        var remembered = FindSearchCommand(appState.LastSearchEngine);
+        if (appState.LastSearchEngine != null && remembered == null)
         {
-            DefaultSearchCommand = SearchCommands[0];
+            _logger.LogWarning("The last engine used, {LastSearchEngine}, is no longer in the configured list",
+                appState.LastSearchEngine);
+        }
+
+        var configured = FindSearchCommand(settings.UserSettings.DefaultSearchEngine);
+        _currentSearchCommand = remembered ?? configured ?? SearchCommands[0];
+        if (remembered == null && configured == null)
+        {
             _logger.LogWarning(
                 "Default search engine {DefaultSearchEngine} is not in the configured list; using {Fallback} instead",
-                settings.UserSettings.DefaultSearchEngine, DefaultSearchCommand.ToolTip);
+                settings.UserSettings.DefaultSearchEngine, _currentSearchCommand.ToolTip);
         }
     }
+
+    private NavigationButtonViewModel FindSearchCommand(string name) =>
+        name == null ? null : SearchCommands.FirstOrDefault(command => command.ToolTip == name);
 
     public void Init(Window window)
     {
@@ -97,9 +110,9 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
         QueryText = text;
 
-        if (DefaultSearchCommand.CanAutoSearch(text))
+        if (CurrentSearchCommand.CanAutoSearch(text))
         {
-            DefaultSearchCommand.Command.Execute(true);
+            CurrentSearchCommand.Command.Execute(true);
         }
         else
         {
@@ -141,6 +154,10 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     private void RequestNavigation(NavigationButtonViewModel source, NavigationRequestedEventArgs args)
     {
+        // The hotkey and Enter search with the current engine, so only a click on another
+        // engine's button actually changes it.
+        CurrentSearchCommand = source;
+        _appState.SetLastSearchEngine(source.ToolTip);
         SetActiveSearchCommand(source);
         NavigationRequested?.Invoke(args);
     }
@@ -157,7 +174,14 @@ public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
 
     public ObservableCollection<NavigationButtonViewModel> SearchCommands { get; }
 
-    public NavigationButtonViewModel DefaultSearchCommand { get; }
+    /// <summary>
+    /// The engine the hotkey, Enter and the magnifier button search with: the one last picked.
+    /// </summary>
+    public NavigationButtonViewModel CurrentSearchCommand
+    {
+        get => _currentSearchCommand;
+        private set => SetField(ref _currentSearchCommand, value);
+    }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {

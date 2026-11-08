@@ -197,7 +197,7 @@
                                 Grid.Column="2"
                                 Width="24"
                                 Height="24"
-                                Command="{Binding DefaultSearchCommand.Command}"
+                                Command="{Binding CurrentSearchCommand.Command}"
                                 Content="&#xE721;"
                                 Focusable="False"
                                 Style="{StaticResource IconButtonStyle}" />
